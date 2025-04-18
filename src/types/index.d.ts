@@ -3,7 +3,7 @@
 /// <reference types="framer-motion" />
 
 import React from 'react';
-import { SVGProps } from 'react';
+import type { SVGProps } from 'react';
 
 declare global {
   namespace JSX {
@@ -13,13 +13,17 @@ declare global {
   }
 }
 
-declare module 'framer-motion';
-declare module '@headlessui/react';
-declare module '@heroicons/react/24/outline';
-declare module 'next/link';
+declare module '@heroicons/react/24/outline' {
+  export const Bars3Icon: (props: SVGProps<SVGSVGElement>) => JSX.Element;
+  export const XMarkIcon: (props: SVGProps<SVGSVGElement>) => JSX.Element;
+  export const ChartBarIcon: (props: SVGProps<SVGSVGElement>) => JSX.Element;
+  export const ShieldCheckIcon: (props: SVGProps<SVGSVGElement>) => JSX.Element;
+  export const AcademicCapIcon: (props: SVGProps<SVGSVGElement>) => JSX.Element;
+  export const CurrencyDollarIcon: (props: SVGProps<SVGSVGElement>) => JSX.Element;
+}
 
 declare module '*.svg' {
-  const content: React.FunctionComponent<SVGProps<SVGSVGElement>>;
+  const content: (props: SVGProps<SVGSVGElement>) => JSX.Element;
   export default content;
 }
 

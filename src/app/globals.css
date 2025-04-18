@@ -4,7 +4,7 @@
 
 :root {
   --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
+  --background-start-rgb: 255, 255, 255;
   --background-end-rgb: 255, 255, 255;
 }
 
@@ -18,12 +18,154 @@
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  background: rgb(var(--background-start-rgb));
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Smooth Scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  @apply font-bold tracking-tight;
+}
+
+/* Links */
+a {
+  @apply transition-colors duration-200;
+}
+
+/* Buttons */
+button {
+  @apply transition-all duration-200;
+}
+
+/* Animations */
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Glass Effect */
+.glass {
+  @apply bg-white/10 backdrop-blur-lg;
+}
+
+/* Gradient Text */
+.gradient-text {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-500;
+}
+
+/* Container */
+.container {
+  @apply px-4 mx-auto max-w-7xl sm:px-6 lg:px-8;
+}
+
+/* Section Spacing */
+section {
+  @apply py-16 md:py-24;
+}
+
+/* Card Hover Effect */
+.card-hover {
+  @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+}
+
+/* Input Fields */
+input, textarea {
+  @apply transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
+}
+
+/* Loading Spinner */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-spinner {
+  @apply animate-spin h-5 w-5 text-white;
+}
+
+/* Custom Selection */
+::selection {
+  @apply bg-blue-500 text-white;
+}
+
+/* Image Optimization */
+img {
+  @apply max-w-full h-auto;
+}
+
+/* List Styles */
+ul, ol {
+  @apply list-inside;
+}
+
+/* Table Styles */
+table {
+  @apply w-full border-collapse;
+}
+
+th, td {
+  @apply border p-2;
+}
+
+/* Form Elements */
+form {
+  @apply space-y-4;
+}
+
+label {
+  @apply block text-sm font-medium text-gray-700;
+}
+
+/* Custom Focus Outline */
+*:focus {
+  @apply outline-none ring-2 ring-blue-500 ring-offset-2;
+}
+
+/* Responsive Font Sizes */
+@screen sm {
+  html {
+    font-size: 16px;
+  }
+}
+
+@screen lg {
+  html {
+    font-size: 18px;
+  }
 }
 
 @layer components {

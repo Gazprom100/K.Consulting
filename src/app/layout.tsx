@@ -6,6 +6,7 @@ import Header from '@/components/Header';
 const inter = Inter({ subsets: ['latin', 'cyrillic'] });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'https://kconsulting.netlify.app'),
   title: 'K.Consulting - Криптовалютный консалтинг',
   description: 'Профессиональные консультации и решения для успешного развития вашего криптовалютного бизнеса. Стейкинг, майнинг, трейдинг и безопасность криптоактивов.',
   keywords: 'криптовалюты, блокчейн, консалтинг, стейкинг, майнинг, трейдинг, криптоактивы, биткоин, инвестиции',
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'K.Consulting - Криптовалютный консалтинг',
     description: 'Профессиональные консультации и решения для успешного развития вашего криптовалютного бизнеса',
-    url: 'https://kconsulting.com',
+    url: '/',
     siteName: 'K.Consulting',
     images: [
       {
