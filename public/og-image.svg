@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200px" height="630px" viewBox="0 0 1200 630" version="1.1" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient x1="0%" y1="0%" x2="100%" y2="100%" id="bgGradient">
+            <stop stop-color="#1E40AF" offset="0%"/>
+            <stop stop-color="#1E3A8A" offset="100%"/>
+        </linearGradient>
+        <linearGradient x1="0%" y1="0%" x2="100%" y2="100%" id="textGradient">
+            <stop stop-color="#60A5FA" offset="0%"/>
+            <stop stop-color="#22D3EE" offset="100%"/>
+        </linearGradient>
+    </defs>
+    
+    <!-- Background -->
+    <rect width="1200" height="630" fill="url(#bgGradient)"/>
+    
+    <!-- Decorative Elements -->
+    <circle cx="1000" cy="100" r="200" fill="url(#textGradient)" opacity="0.1"/>
+    <circle cx="200" cy="500" r="150" fill="url(#textGradient)" opacity="0.1"/>
+    
+    <!-- Main Content -->
+    <g transform="translate(100, 200)">
+        <!-- Logo -->
+        <text x="0" y="0" font-family="Arial, sans-serif" font-size="72" font-weight="bold" fill="white">
+            K.Consulting
+        </text>
+        
+        <!-- Tagline -->
+        <text x="0" y="100" font-family="Arial, sans-serif" font-size="36" fill="#E2E8F0">
+            Ваш надежный партнер в мире криптовалют
+        </text>
+        
+        <!-- Features -->
+        <g transform="translate(0, 180)">
+            <circle cx="20" cy="20" r="10" fill="#60A5FA"/>
+            <text x="50" y="28" font-family="Arial, sans-serif" font-size="24" fill="#E2E8F0">Криптовалютный консалтинг</text>
+            
+            <circle cx="20" cy="70" r="10" fill="#60A5FA"/>
+            <text x="50" y="78" font-family="Arial, sans-serif" font-size="24" fill="#E2E8F0">Стейкинг и фарминг</text>
+            
+            <circle cx="20" cy="120" r="10" fill="#60A5FA"/>
+            <text x="50" y="128" font-family="Arial, sans-serif" font-size="24" fill="#E2E8F0">Безопасность активов</text>
+        </g>
+    </g>
+</svg> 
