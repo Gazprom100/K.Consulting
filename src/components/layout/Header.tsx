@@ -6,7 +6,12 @@ import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { SunIcon, MoonIcon } from '@heroicons/react/24/outline';
 
-const navigation = [
+interface NavigationItem {
+  name: string;
+  href: string;
+}
+
+const navigation: NavigationItem[] = [
   { name: 'Главная', href: '/' },
   { name: 'Услуги', href: '/services' },
   { name: 'Команда', href: '/team' },

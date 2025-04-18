@@ -3,9 +3,21 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ChartBarIcon, ShieldCheckIcon, AcademicCapIcon } from '@heroicons/react/24/outline';
+import { 
+  ChartBarIcon, 
+  ShieldCheckIcon, 
+  AcademicCapIcon,
+  CurrencyDollarIcon 
+} from '@heroicons/react/24/outline';
 
-const features = [
+interface Feature {
+  title: string;
+  description: string;
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  color: string;
+}
+
+const features: Feature[] = [
   {
     title: 'Криптовалютный консалтинг',
     description: 'Профессиональные консультации по инвестициям в криптовалюты и блокчейн-проекты',
