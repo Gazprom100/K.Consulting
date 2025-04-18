@@ -6,7 +6,12 @@ import { motion } from 'framer-motion';
 import { Disclosure, Transition } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 
-const navigation = [
+interface NavigationItem {
+  name: string;
+  href: string;
+}
+
+const navigation: NavigationItem[] = [
   { name: 'Главная', href: '/' },
   { name: 'Услуги', href: '/services' },
   { name: 'Команда', href: '/team' },
@@ -28,7 +33,7 @@ export default function Header() {
 
   return (
     <Disclosure as="nav" className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-white/95 backdrop-blur-sm shadow-md' : 'bg-transparent'}`}>
-      {({ open }) => (
+      {({ open }: { open: boolean }) => (
         <>
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="flex h-16 justify-between items-center">
