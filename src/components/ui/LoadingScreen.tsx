@@ -1,53 +1,50 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
 
-export default function LoadingScreen() {
-  const [isVisible, setIsVisible] = useState(true);
+interface LoadingScreenProps {
+  isVisible: boolean;
+}
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsVisible(false);
-    }, 2000);
-
-    return () => clearTimeout(timer);
-  }, []);
-
+export default function LoadingScreen({ isVisible }: LoadingScreenProps) {
   if (!isVisible) return null;
 
   return (
     <motion.div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900"
       initial={{ opacity: 1 }}
       animate={{ opacity: 0 }}
-      transition={{ duration: 0.5, delay: 1.5 }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-gray-900 via-black to-blue-900"
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.5, delay: 0.2 }}
     >
-      <div className="relative">
+      <div className="flex flex-col items-center">
+        <div className="relative">
+          <motion.div
+            className="h-24 w-24 rounded-full border-4 border-gray-700"
+            animate={{ rotate: 360 }}
+            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+          />
+          <motion.div
+            className="absolute inset-0 h-24 w-24 rounded-full border-t-4 border-red-500"
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+          />
+          <motion.div
+            className="absolute inset-0 h-24 w-24 rounded-full border-r-4 border-red-600"
+            animate={{ rotate: -180 }}
+            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+          />
+        </div>
         <motion.div
-          initial={{ scale: 0.5, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.5 }}
-          className="flex flex-col items-center"
+          className="mt-8 text-2xl font-bold"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
         >
-          <div className="text-4xl font-bold text-white mb-8">K.Consulting</div>
-          <div className="relative w-24 h-24">
-            <motion.div
-              className="absolute inset-0 rounded-full border-t-4 border-blue-500"
-              animate={{ rotate: 360 }}
-              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            />
-            <motion.div
-              className="absolute inset-0 rounded-full border-r-4 border-cyan-500"
-              animate={{ rotate: -180 }}
-              transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-            />
-            <motion.div
-              className="absolute inset-2 rounded-full bg-gradient-to-br from-blue-500/20 to-cyan-500/20 backdrop-blur-sm"
-              animate={{ scale: [1, 1.2, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            />
-          </div>
+          <span className="text-white">K.</span>
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-red-700">
+            Consulting
+          </span>
         </motion.div>
       </div>
     </motion.div>
