@@ -4,7 +4,7 @@
 
 :root {
   --foreground-rgb: 255, 255, 255;
-  --background-start-rgb: 17, 24, 39;
+  --background-start-rgb: 13, 13, 13;
   --background-end-rgb: 0, 0, 0;
   --accent-color: 239, 68, 68;
 }
@@ -24,6 +24,7 @@ body {
     rgb(var(--background-start-rgb)),
     rgb(var(--background-end-rgb))
   );
+  font-feature-settings: "rlig" 1, "calt" 1;
 }
 
 @layer base {
@@ -38,6 +39,10 @@ body {
   h1, h2, h3, h4, h5, h6 {
     @apply tracking-tight;
   }
+
+  p {
+    @apply leading-relaxed;
+  }
 }
 
 /* Custom Scrollbar */
@@ -46,15 +51,16 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-gray-900;
+  background: rgb(var(--background-start-rgb));
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-red-500 rounded-full;
+  background: #ef4444;
+  border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-red-600;
+  background: #dc2626;
 }
 
 /* Smooth Scrolling */
@@ -207,6 +213,14 @@ label {
   .hover-accent-gradient {
     @apply hover:from-red-600 hover:to-red-800;
   }
+
+  .gradient-border {
+    @apply border border-red-500/30 hover:border-red-500 transition-all duration-300;
+  }
+  
+  .gradient-button {
+    @apply bg-gradient-to-r from-red-500 to-red-700 hover:from-red-600 hover:to-red-800 transition-all duration-300;
+  }
 }
 
 /* Loading Animation */
@@ -227,5 +241,60 @@ label {
   }
   100% {
     background-position: -200% 0;
+  }
+}
+
+/* Smooth scrolling for Safari */
+@supports (-webkit-overflow-scrolling: touch) {
+  body {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Animations */
+.fade-in {
+  animation: fadeIn 0.5s ease-in forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Loading animation */
+.loading-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.loading-dots span {
+  width: 4px;
+  height: 4px;
+  background-color: currentColor;
+  border-radius: 50%;
+  animation: dots 1.4s infinite ease-in-out both;
+}
+
+.loading-dots span:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.loading-dots span:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+@keyframes dots {
+  0%, 80%, 100% { 
+    transform: scale(0);
+  } 
+  40% { 
+    transform: scale(1.0);
   }
 } 
