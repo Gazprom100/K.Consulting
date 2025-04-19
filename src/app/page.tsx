@@ -1,122 +1,187 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import Image from 'next/image';
+import { useState } from 'react';
 import Link from 'next/link';
 
-const features = [
+const services = [
   {
-    title: 'Разработка',
-    icon: (
-      <svg className="w-8 h-8 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-      </svg>
-    ),
+    id: 'blockchain',
+    title: 'Блокчейн-разработка',
+    description: 'Создание смарт-контрактов, токенов и DApps на DecimalChain',
+    details: [
+      'Разработка и аудит смарт-контрактов',
+      'Создание токенов и NFT',
+      'Интеграция с DeFi протоколами',
+      'Разработка децентрализованных приложений'
+    ]
   },
   {
+    id: 'consulting',
+    title: 'Криптоконсалтинг',
+    description: 'Стратегическое планирование и консультации по развитию криптопроектов',
+    details: [
+      'Анализ токеномики',
+      'Стратегия выхода на рынок',
+      'Оценка рисков и безопасности',
+      'Юридическое сопровождение'
+    ]
+  },
+  {
+    id: 'integration',
     title: 'Интеграция',
-    icon: (
-      <svg className="w-8 h-8 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-      </svg>
-    ),
-  },
-  {
-    title: 'Обучение',
-    icon: (
-      <svg className="w-8 h-8 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-      </svg>
-    ),
-  },
-  {
-    title: 'Маркетинг',
-    icon: (
-      <svg className="w-8 h-8 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
-      </svg>
-    ),
-  },
+    description: 'Внедрение блокчейн-технологий в существующий бизнес',
+    details: [
+      'Аудит текущей инфраструктуры',
+      'Разработка архитектуры решения',
+      'Интеграция с legacy-системами',
+      'Обучение персонала'
+    ]
+  }
+];
+
+const stats = [
+  { number: '50+', label: 'Успешных проектов' },
+  { number: '100M+', label: 'Общий объем инвестиций' },
+  { number: '30+', label: 'Экспертов в команде' },
+  { number: '5+', label: 'Лет на рынке' }
 ];
 
 export default function Home() {
+  const [activeService, setActiveService] = useState('blockchain');
+  const [activeTab, setActiveTab] = useState(0);
+
+  const tabs = [
+    { name: 'Все услуги', content: 'all' },
+    { name: 'Для стартапов', content: 'startups' },
+    { name: 'Для бизнеса', content: 'business' }
+  ];
+
   return (
     <main className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-black opacity-90" />
-          <div className="absolute right-0 bottom-0">
-            <svg width="400" height="400" viewBox="0 0 400 400" fill="none">
-              <circle cx="200" cy="200" r="200" stroke="url(#gradient)" strokeWidth="0.5" />
-              <defs>
-                <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#EF4444" />
-                  <stop offset="100%" stopColor="#991B1B" />
-                </linearGradient>
-              </defs>
-            </svg>
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-800">
+            <div className="absolute inset-0 opacity-30">
+              <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-red-500/20 via-transparent to-transparent animate-pulse" />
+              <div className="absolute bottom-0 right-0 w-full h-full bg-gradient-to-tl from-red-700/20 via-transparent to-transparent animate-pulse delay-1000" />
+            </div>
           </div>
         </div>
 
-        <div className="container mx-auto px-4 z-10">
+        <div className="container relative z-10 mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-center"
+            className="text-center max-w-5xl mx-auto"
           >
-            <h1 className="text-5xl md:text-7xl font-bold mb-6">
+            <h1 className="text-6xl md:text-8xl font-bold mb-8">
               <span className="text-white">K.</span>
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-red-700">
                 Consulting
               </span>
             </h1>
-            <p className="text-xl md:text-2xl text-gray-300 mb-8">
-              Создайте свой уникальный продукт<br />
-              на блокчейне DecimalChain
+            <p className="text-2xl md:text-3xl text-gray-300 mb-12 leading-relaxed">
+              Создаем будущее блокчейн-технологий<br />
+              для вашего бизнеса
             </p>
-            <div className="flex justify-center space-x-4">
+            <div className="flex flex-col sm:flex-row gap-6 justify-center">
               <Link
                 href="/contact"
-                className="bg-gradient-to-r from-red-500 to-red-700 text-white px-8 py-3 rounded-lg font-medium hover:from-red-600 hover:to-red-800 transition-all duration-300"
+                className="bg-gradient-to-r from-red-500 to-red-700 text-white px-8 py-4 rounded-lg font-medium hover:from-red-600 hover:to-red-800 transition-all duration-300 text-lg"
               >
-                Связаться с нами
+                Начать проект
+              </Link>
+              <Link
+                href="/about"
+                className="bg-gray-800 text-white px-8 py-4 rounded-lg font-medium hover:bg-gray-700 transition-all duration-300 text-lg border border-gray-700"
+              >
+                О компании
               </Link>
             </div>
           </motion.div>
         </div>
+
+        <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2">
+          <motion.div
+            animate={{ y: [0, 10, 0] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            className="text-gray-400"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+            </svg>
+          </motion.div>
+        </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-20 bg-gray-900">
+      {/* Services Tabs Section */}
+      <section className="py-20 bg-black">
         <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Наши возможности</h2>
-            <p className="text-gray-400 text-lg">
-              Мы специализируемся на блокчейн-токенизации, маркетинговых стратегиях,<br />
-              брендинге продуктов и их интеграции в экосистему DecimalChain
-            </p>
-          </motion.div>
+          <div className="flex justify-center mb-12">
+            <div className="border border-gray-800 rounded-lg p-1">
+              {tabs.map((tab, index) => (
+                <button
+                  key={tab.name}
+                  className={`px-8 py-3 rounded-lg text-sm font-medium transition-all duration-300 ${
+                    activeTab === index
+                      ? 'bg-red-500 text-white'
+                      : 'text-gray-400 hover:text-white'
+                  }`}
+                  onClick={() => setActiveTab(index)}
+                >
+                  {tab.name}
+                </button>
+              ))}
+            </div>
+          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, index) => (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {services.map((service) => (
               <motion.div
-                key={feature.title}
+                key={service.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className={`bg-gray-900 rounded-2xl p-8 cursor-pointer transition-all duration-300 border border-gray-800 ${
+                  activeService === service.id ? 'border-red-500' : 'hover:border-gray-700'
+                }`}
+                onClick={() => setActiveService(service.id)}
+              >
+                <h3 className="text-2xl font-bold mb-4">{service.title}</h3>
+                <p className="text-gray-400 mb-6">{service.description}</p>
+                <ul className="space-y-3">
+                  {service.details.map((detail, index) => (
+                    <li key={index} className="flex items-center text-gray-300">
+                      <svg className="w-5 h-5 text-red-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      {detail}
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="py-20 bg-gradient-to-b from-black to-gray-900">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {stats.map((stat, index) => (
+              <motion.div
+                key={index}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="bg-gray-800 rounded-xl p-6 hover:bg-gray-700 transition-all duration-300"
+                className="text-center"
               >
-                <div className="bg-gray-900 rounded-lg p-3 inline-block mb-4">
-                  {feature.icon}
-                </div>
-                <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
+                <div className="text-4xl md:text-5xl font-bold text-white mb-2">{stat.number}</div>
+                <div className="text-gray-400">{stat.label}</div>
               </motion.div>
             ))}
           </div>
@@ -133,18 +198,18 @@ export default function Home() {
               transition={{ duration: 0.8 }}
               className="lg:w-1/2"
             >
-              <h2 className="text-3xl md:text-4xl font-bold mb-6">
-                Пишем будущее
-                <span className="text-red-500"> вместе</span>
+              <h2 className="text-4xl md:text-5xl font-bold mb-6">
+                Эксперты в области
+                <span className="text-red-500"> блокчейна</span>
               </h2>
-              <div className="bg-gray-800 rounded-lg p-6 mb-6">
+              <div className="bg-gray-900 rounded-2xl p-8 mb-6 border border-gray-800">
                 <p className="text-xl text-gray-300">
-                  Мы не следуем тенденциям — мы их создаем
+                  Мы объединяем опыт традиционного бизнеса с инновациями блокчейн-технологий
                 </p>
               </div>
-              <p className="text-gray-400">
-                K.Consulting — не просто блокчейн-решения, а стратегический партнёр, который видит
-                и развивает потенциал вашего бизнеса на новых технологических горизонтах
+              <p className="text-gray-400 text-lg leading-relaxed">
+                Наша команда состоит из опытных разработчиков, бизнес-аналитиков и консультантов,
+                которые помогут вам создать и развить успешный блокчейн-проект на платформе DecimalChain
               </p>
             </motion.div>
             <motion.div
@@ -154,14 +219,40 @@ export default function Home() {
               className="lg:w-1/2"
             >
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-700 opacity-20 rounded-xl" />
+                <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-700 opacity-20 rounded-2xl" />
                 <img
                   src="/team.jpg"
                   alt="Команда K.Consulting"
-                  className="rounded-xl relative z-10"
+                  className="rounded-2xl relative z-10"
                 />
               </div>
             </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 bg-gradient-to-b from-gray-900 to-black relative overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 to-red-700/10" />
+        </div>
+        <div className="container mx-auto px-4 relative">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-4xl md:text-5xl font-bold mb-8">
+              Готовы начать свой путь в мире блокчейна?
+            </h2>
+            <p className="text-xl text-gray-300 mb-12">
+              Запишитесь на бесплатную консультацию и получите персональный план развития вашего проекта
+            </p>
+            <Link
+              href="/contact"
+              className="inline-flex items-center px-12 py-4 text-lg font-medium rounded-lg text-white bg-gradient-to-r from-red-500 to-red-700 hover:from-red-600 hover:to-red-800 transition-all duration-300"
+            >
+              Связаться с нами
+              <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </Link>
           </div>
         </div>
       </section>
