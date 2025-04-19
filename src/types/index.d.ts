@@ -2,7 +2,8 @@
 /// <reference types="next" />
 /// <reference types="framer-motion" />
 
-import React from 'react';
+import React, { PropsWithChildren } from 'react';
+import type { LinkProps as NextLinkProps } from 'next/link';
 import type { SVGProps } from 'react';
 
 declare global {
@@ -22,26 +23,14 @@ declare module '@heroicons/react/24/outline' {
   export const CurrencyDollarIcon: (props: SVGProps<SVGSVGElement>) => JSX.Element;
 }
 
-declare module 'next/link' {
-  import type { LinkProps as NextLinkProps } from 'next/dist/client/link';
-  import type { PropsWithChildren } from 'react';
-
-  type LinkProps = PropsWithChildren<NextLinkProps> & {
-    className?: string;
-  };
-
-  export default function Link(props: LinkProps): JSX.Element;
-}
-
 declare module '@headlessui/react' {
   interface DisclosureProps {
-    as?: React.ElementType;
     children: ({ open }: { open: boolean }) => React.ReactNode;
+    as?: React.ElementType;
     className?: string;
   }
 
   interface DisclosureButtonProps {
-    as?: React.ElementType;
     children: React.ReactNode;
     className?: string;
   }
@@ -51,36 +40,31 @@ declare module '@headlessui/react' {
     className?: string;
   }
 
-  interface TransitionProps {
-    show?: boolean;
-    enter?: string;
-    enterFrom?: string;
-    enterTo?: string;
-    leave?: string;
-    leaveFrom?: string;
-    leaveTo?: string;
-    children: React.ReactNode;
-  }
-
-  export function Disclosure(props: DisclosureProps): JSX.Element;
-  export namespace Disclosure {
-    function Button(props: DisclosureButtonProps): JSX.Element;
-    function Panel(props: DisclosurePanelProps): JSX.Element;
-  }
-  export function Transition(props: TransitionProps): JSX.Element;
+  export const Disclosure: React.FC<DisclosureProps> & {
+    Button: React.FC<DisclosureButtonProps>;
+    Panel: React.FC<DisclosurePanelProps>;
+  };
 }
 
 declare module '*.svg' {
-  const content: (props: SVGProps<SVGSVGElement>) => JSX.Element;
+  const content: React.FC<React.SVGProps<SVGSVGElement>>;
   export default content;
 }
 
+declare module 'next/link' {
+  interface LinkProps extends NextLinkProps {
+    children?: React.ReactNode;
+    className?: string;
+    href: string;
+  }
+  export default React.ForwardRefExoticComponent<LinkProps>;
+}
+
 declare module 'framer-motion' {
-  export interface MotionProps {
+  interface MotionProps {
     initial?: any;
     animate?: any;
     exit?: any;
-    transition?: any;
     whileHover?: any;
     whileTap?: any;
     className?: string;
@@ -88,7 +72,9 @@ declare module 'framer-motion' {
   }
 
   export const motion: {
-    [key: string]: React.FC<MotionProps>;
+    [K in keyof JSX.IntrinsicElements]: React.ForwardRefExoticComponent<
+      MotionProps & JSX.IntrinsicElements[K]
+    >;
   };
 }
 

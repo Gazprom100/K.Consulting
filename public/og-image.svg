@@ -1,45 +1,77 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="1200px" height="630px" viewBox="0 0 1200 630" version="1.1" xmlns="http://www.w3.org/2000/svg">
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Градиенты -->
     <defs>
-        <linearGradient x1="0%" y1="0%" x2="100%" y2="100%" id="bgGradient">
-            <stop stop-color="#1E40AF" offset="0%"/>
-            <stop stop-color="#1E3A8A" offset="100%"/>
+        <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#1E293B;stop-opacity:1" />
+            <stop offset="50%" style="stop-color:#0F172A;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#1E293B;stop-opacity:1" />
         </linearGradient>
-        <linearGradient x1="0%" y1="0%" x2="100%" y2="100%" id="textGradient">
-            <stop stop-color="#60A5FA" offset="0%"/>
-            <stop stop-color="#22D3EE" offset="100%"/>
+        <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#06B6D4;stop-opacity:1" />
         </linearGradient>
+        <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="15" />
+        </filter>
     </defs>
-    
-    <!-- Background -->
-    <rect width="1200" height="630" fill="url(#bgGradient)"/>
-    
-    <!-- Decorative Elements -->
-    <circle cx="1000" cy="100" r="200" fill="url(#textGradient)" opacity="0.1"/>
-    <circle cx="200" cy="500" r="150" fill="url(#textGradient)" opacity="0.1"/>
-    
-    <!-- Main Content -->
-    <g transform="translate(100, 200)">
-        <!-- Logo -->
-        <text x="0" y="0" font-family="Arial, sans-serif" font-size="72" font-weight="bold" fill="white">
-            K.Consulting
-        </text>
-        
-        <!-- Tagline -->
-        <text x="0" y="100" font-family="Arial, sans-serif" font-size="36" fill="#E2E8F0">
-            Ваш надежный партнер в мире криптовалют
-        </text>
-        
-        <!-- Features -->
-        <g transform="translate(0, 180)">
-            <circle cx="20" cy="20" r="10" fill="#60A5FA"/>
-            <text x="50" y="28" font-family="Arial, sans-serif" font-size="24" fill="#E2E8F0">Криптовалютный консалтинг</text>
-            
-            <circle cx="20" cy="70" r="10" fill="#60A5FA"/>
-            <text x="50" y="78" font-family="Arial, sans-serif" font-size="24" fill="#E2E8F0">Стейкинг и фарминг</text>
-            
-            <circle cx="20" cy="120" r="10" fill="#60A5FA"/>
-            <text x="50" y="128" font-family="Arial, sans-serif" font-size="24" fill="#E2E8F0">Безопасность активов</text>
+
+    <!-- Фон -->
+    <rect width="1200" height="630" fill="url(#bgGradient)" />
+
+    <!-- Декоративные элементы фона -->
+    <g opacity="0.1">
+        <circle cx="100" cy="100" r="400" fill="url(#accentGradient)" filter="url(#glow)" />
+        <circle cx="1100" cy="530" r="300" fill="url(#accentGradient)" filter="url(#glow)" />
+    </g>
+
+    <!-- Сетка -->
+    <g opacity="0.05">
+        <path d="M0 315 L1200 315" stroke="white" stroke-width="1" />
+        <path d="M600 0 L600 630" stroke="white" stroke-width="1" />
+        <circle cx="600" cy="315" r="200" stroke="white" stroke-width="1" fill="none" />
+    </g>
+
+    <!-- Основной контент -->
+    <g transform="translate(600 315)">
+        <!-- Логотип -->
+        <g transform="translate(-400 -100)">
+            <text x="0" y="0" fill="white" font-family="Arial" font-size="72" font-weight="bold">
+                K.Consulting
+            </text>
+            <text x="0" y="60" fill="#94A3B8" font-family="Arial" font-size="32">
+                Криптовалютный консалтинг
+            </text>
         </g>
+
+        <!-- Иконки сервисов -->
+        <g transform="translate(100 -50)">
+            <!-- Bitcoin -->
+            <circle cx="0" cy="0" r="40" fill="url(#accentGradient)" opacity="0.9" />
+            <text x="0" y="0" fill="white" font-family="Arial" font-size="36" text-anchor="middle" dominant-baseline="middle">₿</text>
+
+            <!-- Ethereum -->
+            <circle cx="100" cy="0" r="40" fill="url(#accentGradient)" opacity="0.9" />
+            <text x="100" y="0" fill="white" font-family="Arial" font-size="36" text-anchor="middle" dominant-baseline="middle">Ξ</text>
+
+            <!-- Другие символы -->
+            <circle cx="200" cy="0" r="40" fill="url(#accentGradient)" opacity="0.9" />
+            <text x="200" y="0" fill="white" font-family="Arial" font-size="36" text-anchor="middle" dominant-baseline="middle">⟠</text>
+        </g>
+
+        <!-- Особенности -->
+        <g transform="translate(-350 100)" fill="white" font-family="Arial" opacity="0.8">
+            <text x="0" y="0" font-size="24">✓ Профессиональные консультации</text>
+            <text x="0" y="40" font-size="24">✓ Безопасность активов</text>
+            <text x="0" y="80" font-size="24">✓ Инновационные решения</text>
+        </g>
+    </g>
+
+    <!-- Декоративные элементы -->
+    <g opacity="0.5">
+        <circle cx="50" cy="50" r="4" fill="white" />
+        <circle cx="1150" cy="580" r="4" fill="white" />
+        <circle cx="1150" cy="50" r="4" fill="white" />
+        <circle cx="50" cy="580" r="4" fill="white" />
     </g>
 </svg> 
