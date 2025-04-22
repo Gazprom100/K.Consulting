@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Montserrat } from 'next/font/google';
+import DonateModal from '@/components/DonateModal';
 
 const montserrat = Montserrat({ subsets: ['latin', 'cyrillic'] });
 
@@ -245,6 +246,7 @@ const stats = [
 export default function Home() {
   const [activeTab, setActiveTab] = useState('main');
   const [activeCategory, setActiveCategory] = useState('investment');
+  const [isDonateModalOpen, setIsDonateModalOpen] = useState(false);
   
   // Добавляем Bootstrap JS на стороне клиента
   useEffect(() => {
@@ -311,6 +313,13 @@ export default function Home() {
               <p className="lead fs-4 mb-4">
                 Профессиональные решения в мире криптовалют и блокчейна
               </p>
+              <button 
+                className="btn btn-danger btn-lg"
+                onClick={() => setIsDonateModalOpen(true)}
+                id="donate"
+              >
+                <i className="bi bi-heart-fill me-2"></i> Отправить донат
+              </button>
             </div>
 
             {/* Статистика */}
@@ -641,6 +650,12 @@ export default function Home() {
           </div>
         </div>
       </footer>
+      
+      {/* Модальное окно для доната */}
+      <DonateModal 
+        isOpen={isDonateModalOpen} 
+        onClose={() => setIsDonateModalOpen(false)} 
+      />
     </div>
   );
 } 
