@@ -13,6 +13,7 @@ export default function DonateModal({ isOpen, onClose }: DonateModalProps) {
   const [error, setError] = useState('');
   const [retry, setRetry] = useState(false);
   const [debug, setDebug] = useState<any>(null); // Для отображения отладочной информации
+  const [showAdvanced, setShowAdvanced] = useState(false); // Для показа дополнительных опций
 
   // Предустановленные суммы для выбора
   const presetAmounts = ['100', '500', '1000', '5000'];
@@ -43,6 +44,7 @@ export default function DonateModal({ isOpen, onClose }: DonateModalProps) {
       console.log('Отправка запроса на создание платежа:', { amount });
       
       // Отправка запроса на создание платежа
+      const startTime = Date.now();
       const response = await fetch('/api/create-payment', {
         method: 'POST',
         headers: {
@@ -50,8 +52,11 @@ export default function DonateModal({ isOpen, onClose }: DonateModalProps) {
         },
         body: JSON.stringify({ amount }),
       });
+      const endTime = Date.now();
+      const requestDuration = endTime - startTime;
 
       console.log('Получен ответ со статусом:', response.status);
+      console.log('Время запроса:', requestDuration, 'мс');
       
       // Получаем текст ответа
       const responseText = await response.text();
@@ -61,16 +66,46 @@ export default function DonateModal({ isOpen, onClose }: DonateModalProps) {
       let data;
       try {
         data = JSON.parse(responseText);
-        setDebug(data); // Сохраняем для отладки
-      } catch (e) {
+        setDebug({
+          status: response.status,
+          headers: Object.fromEntries(response.headers.entries()),
+          data,
+          requestDuration
+        });
+      } catch (e: any) {
         console.error('Ошибка парсинга JSON:', e);
-        setDebug({ rawResponse: responseText });
+        setDebug({
+          status: response.status,
+          headers: Object.fromEntries(response.headers.entries()),
+          rawResponse: responseText,
+          error: e.message,
+          requestDuration
+        });
         throw new Error('Получен некорректный ответ от сервера. Пожалуйста, попробуйте позже.');
       }
       
       if (!response.ok) {
         const errorMessage = data.error || 'Неизвестная ошибка';
-        const errorDetails = data.details ? (typeof data.details === 'string' ? data.details : JSON.stringify(data.details)) : '';
+        let errorDetails = '';
+        
+        // Извлекаем детали ошибки в человекочитаемом формате
+        if (data.details) {
+          if (typeof data.details === 'string') {
+            errorDetails = data.details;
+          } else if (typeof data.details === 'object') {
+            errorDetails = JSON.stringify(data.details);
+          }
+        }
+        
+        // Проверяем на наличие testResult для отображения подробностей
+        if (data.testResult) {
+          setDebug({
+            ...data,
+            status: response.status,
+            requestDuration
+          });
+        }
+        
         console.error('Ошибка API:', errorMessage, errorDetails);
         throw new Error(`${errorMessage}${errorDetails ? ': ' + errorDetails : ''}`);
       }
@@ -102,6 +137,28 @@ export default function DonateModal({ isOpen, onClose }: DonateModalProps) {
     handleSubmit({ preventDefault: () => {} } as React.FormEvent);
   };
 
+  // Тестовый запрос напрямую к Wata API
+  const handleTestDirectApi = async () => {
+    try {
+      setIsLoading(true);
+      setError('');
+      setDebug(null);
+      
+      // Открываем вкладку с документацией API
+      window.open('https://wata.pro/api', '_blank');
+      
+      setDebug({
+        message: 'Открыта документация API для проверки настроек',
+        timestamp: new Date().toISOString()
+      });
+      
+    } catch (e: any) {
+      setError(`Ошибка при тесте API: ${e.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -116,7 +173,7 @@ export default function DonateModal({ isOpen, onClose }: DonateModalProps) {
       {/* Модальное окно */}
       <div 
         className="position-fixed top-50 start-50 translate-middle bg-dark border border-secondary rounded-3 p-4"
-        style={{ zIndex: 1055, width: '95%', maxWidth: '450px' }}
+        style={{ zIndex: 1055, width: '95%', maxWidth: '450px', maxHeight: '90vh', overflow: 'auto' }}
       >
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h5 className="m-0 text-white">Отправить донат</h5>
@@ -131,15 +188,42 @@ export default function DonateModal({ isOpen, onClose }: DonateModalProps) {
         {error && (
           <div className="alert alert-danger mb-4" role="alert">
             <p className="mb-2">{error}</p>
-            {retry && (
+            <div className="d-flex gap-2 mt-2">
+              {retry && (
+                <button 
+                  className="btn btn-sm btn-danger" 
+                  onClick={handleRetry}
+                  disabled={isLoading}
+                >
+                  Попробовать снова
+                </button>
+              )}
               <button 
-                className="btn btn-sm btn-danger mt-2" 
-                onClick={handleRetry}
-                disabled={isLoading}
+                className="btn btn-sm btn-outline-danger"
+                onClick={() => setShowAdvanced(!showAdvanced)}
               >
-                Попробовать снова
+                {showAdvanced ? 'Скрыть' : 'Подробнее'}
               </button>
-            )}
+            </div>
+          </div>
+        )}
+        
+        {/* Расширенные настройки (при наличии ошибки) */}
+        {showAdvanced && (
+          <div className="mb-4 p-3 border border-secondary rounded">
+            <h6 className="text-light mb-3">Диагностика</h6>
+            <button 
+              className="btn btn-sm btn-outline-light mb-3" 
+              onClick={handleTestDirectApi}
+              disabled={isLoading}
+            >
+              Открыть документацию API
+            </button>
+            
+            <div className="small text-light">
+              <p className="mb-1">API URL: api.wata.pro</p>
+              <p className="mb-1">Текущий сервер: <span className="text-info">{window.location.host}</span></p>
+            </div>
           </div>
         )}
         
@@ -202,7 +286,7 @@ export default function DonateModal({ isOpen, onClose }: DonateModalProps) {
         {/* Отладочная информация */}
         {debug && (
           <div className="mt-4 pt-4 border-top border-secondary">
-            <details>
+            <details open={!!error}>
               <summary className="text-muted small">Техническая информация</summary>
               <pre className="mt-2 p-2 bg-dark text-light small" style={{ maxHeight: '200px', overflow: 'auto' }}>
                 {JSON.stringify(debug, null, 2)}
