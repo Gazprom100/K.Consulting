@@ -11,22 +11,33 @@ export default function DonateModal({ isOpen, onClose }: DonateModalProps) {
   const [amount, setAmount] = useState('100');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [retry, setRetry] = useState(false); // Для отслеживания повторной попытки
 
   // Предустановленные суммы для выбора
   const presetAmounts = ['100', '500', '1000', '5000'];
+
+  // Очистка ошибки при изменении суммы
+  const handleAmountChange = (newAmount: string) => {
+    if (error) setError('');
+    setAmount(newAmount.replace(/[^0-9]/g, ''));
+  };
 
   // Обработчик отправки формы
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setRetry(false);
     
-    if (!amount || isNaN(parseFloat(amount)) || parseFloat(amount) <= 0) {
+    // Проверка правильности введенной суммы
+    const numAmount = parseFloat(amount);
+    if (!amount || isNaN(numAmount) || numAmount <= 0) {
       setError('Пожалуйста, введите корректную сумму');
       return;
     }
 
     try {
       setIsLoading(true);
+      console.log('Отправка запроса на создание платежа:', { amount });
       
       // Отправка запроса на создание платежа
       const response = await fetch('/api/create-payment', {
@@ -37,21 +48,52 @@ export default function DonateModal({ isOpen, onClose }: DonateModalProps) {
         body: JSON.stringify({ amount }),
       });
 
-      const data = await response.json();
+      console.log('Получен ответ со статусом:', response.status);
+      
+      // Получаем текст ответа
+      const responseText = await response.text();
+      console.log('Текст ответа:', responseText);
+      
+      // Попытка парсинга JSON
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (e) {
+        console.error('Ошибка парсинга JSON:', e);
+        throw new Error('Получен некорректный ответ от сервера. Пожалуйста, попробуйте позже.');
+      }
       
       if (!response.ok) {
-        throw new Error(data.error || 'Ошибка при создании платежа');
+        const errorMessage = data.error || 'Неизвестная ошибка';
+        const errorDetails = data.details ? JSON.stringify(data.details) : '';
+        console.error('Ошибка API:', errorMessage, errorDetails);
+        throw new Error(`${errorMessage}${errorDetails ? ': ' + errorDetails : ''}`);
       }
+      
+      if (!data.paymentUrl) {
+        console.error('В ответе отсутствует платежная ссылка:', data);
+        throw new Error('Сервер не вернул платежную ссылку. Пожалуйста, попробуйте позже.');
+      }
+      
+      console.log('Успешно получена платежная ссылка:', data.paymentUrl);
       
       // Перенаправление на страницу оплаты
       window.location.href = data.paymentUrl;
       
     } catch (error: any) {
       console.error('Ошибка при создании платежа:', error);
-      setError(error.message || 'Произошла ошибка. Пожалуйста, попробуйте снова.');
+      setError(error.message || 'Произошла ошибка. Пожалуйста, попробуйте снова позже.');
+      setRetry(true); // Включаем возможность повторной попытки
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Повторить попытку
+  const handleRetry = () => {
+    setError('');
+    setRetry(false);
+    handleSubmit({ preventDefault: () => {} } as React.FormEvent);
   };
 
   if (!isOpen) return null;
@@ -82,7 +124,16 @@ export default function DonateModal({ isOpen, onClose }: DonateModalProps) {
         
         {error && (
           <div className="alert alert-danger mb-4" role="alert">
-            {error}
+            <p className="mb-2">{error}</p>
+            {retry && (
+              <button 
+                className="btn btn-sm btn-danger mt-2" 
+                onClick={handleRetry}
+                disabled={isLoading}
+              >
+                Попробовать снова
+              </button>
+            )}
           </div>
         )}
         
@@ -95,7 +146,7 @@ export default function DonateModal({ isOpen, onClose }: DonateModalProps) {
                 className="form-control bg-secondary text-white border-dark" 
                 id="amount"
                 value={amount}
-                onChange={(e) => setAmount(e.target.value.replace(/[^0-9]/g, ''))}
+                onChange={(e) => handleAmountChange(e.target.value)}
                 placeholder="Введите сумму"
                 required
               />
@@ -110,7 +161,7 @@ export default function DonateModal({ isOpen, onClose }: DonateModalProps) {
                   key={preset}
                   type="button"
                   className={`btn ${amount === preset ? 'btn-danger' : 'btn-outline-danger'}`}
-                  onClick={() => setAmount(preset)}
+                  onClick={() => handleAmountChange(preset)}
                 >
                   {preset} ₽
                 </button>
