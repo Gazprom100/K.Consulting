@@ -7,7 +7,11 @@ import DonateModal from '@/components/DonateModal';
 
 // Футуристичный шрифт
 import { Orbitron } from 'next/font/google';
-const orbitron = Orbitron({ subsets: ['latin'] });
+const orbitron = Orbitron({ 
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  display: 'swap'
+});
 
 // Услуги компании
 const services = [
@@ -26,11 +30,37 @@ export default function Home() {
     visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
   };
 
+  useEffect(() => {
+    // Подключаем Bootstrap JS динамически
+    const loadBootstrapJS = async () => {
+      if (typeof window !== 'undefined') {
+        try {
+          const url = 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js';
+          // Проверяем, не загружен ли уже скрипт
+          if (!document.querySelector(`script[src="${url}"]`)) {
+            const script = document.createElement('script');
+            script.src = url;
+            script.async = true;
+            document.body.appendChild(script);
+            console.log('Bootstrap JS загружен');
+          }
+        } catch (err) {
+          console.error('Ошибка загрузки Bootstrap JS:', err);
+        }
+      }
+    };
+    
+    loadBootstrapJS();
+  }, []);
+
   return (
-    <div className="relative min-h-screen bg-black text-white overflow-hidden">
+    <div className="min-h-screen bg-black text-white">
       {/* Декоративная сетка/фон */}
       <div className="fixed inset-0 z-0">
-        <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] bg-repeat opacity-5"></div>
+        <div className="absolute inset-0 bg-[rgba(255,59,59,0.03)] opacity-10" style={{ 
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='20' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 0L0 0 0 20' fill='none' stroke='rgba(255,59,59,0.15)' stroke-width='0.5'/%3E%3C/svg%3E")`,
+          backgroundSize: '20px 20px'
+        }}></div>
         <div className="absolute top-0 right-0 w-1/2 h-screen bg-gradient-to-bl from-red-500/5 via-transparent to-transparent"></div>
         <div className="absolute bottom-0 left-0 w-1/2 h-screen bg-gradient-to-tr from-red-500/5 via-transparent to-transparent"></div>
       </div>
@@ -44,31 +74,39 @@ export default function Home() {
       </div>
 
       {/* Шапка/Навигация */}
-      <header className="relative z-10 border-b border-red-500/20">
+      <header className="border-b border-red-500/20 sticky top-0 bg-black z-50">
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex items-center justify-between py-4">
-            <div className={`${orbitron.className} text-2xl font-bold text-red-500`}>
+            <a href="/" className={`${orbitron.className} text-2xl font-bold text-red-500`}>
               K.CONSULTING
-            </div>
+            </a>
             <nav className="hidden md:flex items-center space-x-10">
-              <Link href="#about" className="text-sm uppercase hover:text-red-500 transition-colors">
+              <a href="#about" className="text-sm uppercase hover:text-red-500 transition-colors">
                 О НАС
-              </Link>
-              <Link href="#services" className="text-sm uppercase hover:text-red-500 transition-colors">
+              </a>
+              <a href="#services" className="text-sm uppercase hover:text-red-500 transition-colors">
                 УСЛУГИ
-              </Link>
-              <Link href="#cases" className="text-sm uppercase hover:text-red-500 transition-colors">
+              </a>
+              <a href="#cases" className="text-sm uppercase hover:text-red-500 transition-colors">
                 КЕЙСЫ
-              </Link>
+              </a>
             </nav>
+            <button 
+              className="md:hidden text-white focus:outline-none"
+              aria-label="Меню"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
           </div>
         </div>
       </header>
 
       <main className="relative z-10">
         {/* Hero секция */}
-        <section className="relative min-h-screen flex items-center">
-          <div className="container mx-auto px-4 md:px-6 py-24">
+        <section className="py-20 min-h-screen flex items-center">
+          <div className="container mx-auto px-4 md:px-6">
             <motion.div 
               initial="hidden"
               animate="visible"
@@ -95,7 +133,7 @@ export default function Home() {
         </section>
 
         {/* Услуги */}
-        <section id="services" className="relative py-24 border-t border-red-500/20">
+        <section id="services" className="py-24 border-t border-red-500/20">
           <div className="container mx-auto px-4 md:px-6">
             <motion.div
               initial="hidden"
@@ -126,7 +164,7 @@ export default function Home() {
         </section>
 
         {/* Кейсы */}
-        <section id="cases" className="relative py-24 border-t border-red-500/20">
+        <section id="cases" className="py-24 border-t border-red-500/20">
           <div className="container mx-auto px-4 md:px-6">
             <motion.div
               initial="hidden"
@@ -154,7 +192,7 @@ export default function Home() {
         </section>
 
         {/* Контакты */}
-        <section id="contact" className="relative py-24 border-t border-red-500/20">
+        <section id="contact" className="py-24 border-t border-red-500/20">
           <div className="container mx-auto px-4 md:px-6">
             <motion.div
               initial="hidden"
@@ -176,13 +214,13 @@ export default function Home() {
       </main>
 
       {/* Футер */}
-      <footer className="relative z-10 py-8 border-t border-red-500/20">
+      <footer className="py-8 border-t border-red-500/20 mt-auto">
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className={`${orbitron.className} text-xl font-bold text-red-500 mb-4 md:mb-0`}>
               K.CONSULTING
             </div>
-            <div className="flex space-x-6 items-center">
+            <div className="flex flex-wrap gap-4 justify-center items-center">
               <Link href="/privacy" className="text-sm hover:text-red-500 transition-colors">
                 Политика конфиденциальности
               </Link>
@@ -205,6 +243,22 @@ export default function Home() {
         isOpen={isDonateModalOpen} 
         onClose={() => setIsDonateModalOpen(false)} 
       />
+
+      {/* Стили для исправления проблем с взаимодействием Bootstrap и Tailwind */}
+      <style jsx global>{`
+        /* Глобальные стили для исправления конфликтов */
+        body {
+          overflow-x: hidden;
+          background-color: black !important;
+          color: white !important;
+        }
+        .container {
+          width: 100%;
+          max-width: 1200px;
+          margin-left: auto;
+          margin-right: auto;
+        }
+      `}</style>
     </div>
   );
 } 
