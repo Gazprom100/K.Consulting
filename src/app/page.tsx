@@ -1,11 +1,8 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Montserrat } from 'next/font/google';
-import { Tab } from '@headlessui/react';
-import { useRouter } from 'next/navigation';
 
 const montserrat = Montserrat({ subsets: ['latin', 'cyrillic'] });
 
@@ -246,335 +243,404 @@ const stats = [
 ];
 
 export default function Home() {
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  const router = useRouter();
+  const [activeTab, setActiveTab] = useState('main');
   const [activeCategory, setActiveCategory] = useState('investment');
   
-  // Define tabs
-  const tabs = [
-    { name: 'Главная', href: '#main' },
-    { name: 'Услуги', href: '#services' },
-    { name: 'О нас', href: '#about' },
-    { name: 'Контакты', href: '#contact' }
-  ];
+  // Добавляем Bootstrap JS на стороне клиента
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      require('bootstrap/dist/js/bootstrap');
+    }
+  }, []);
 
   return (
-    <div className="min-h-screen bg-gray-900">
-      {/* Main navigation tabs */}
-      <div className="sticky top-16 z-10 bg-gray-800 shadow-md">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <Tab.Group selectedIndex={selectedIndex} onChange={(index: number) => setSelectedIndex(index)}>
-            <Tab.List className="flex space-x-4 py-3 overflow-x-auto">
-              {tabs.map((tab, index) => (
-                <Tab
-                  key={index}
-                  className={({ selected }: { selected: boolean }) =>
-                    `px-4 py-2 text-sm font-medium rounded-md transition-colors whitespace-nowrap
-                    ${selected 
-                      ? 'bg-red-600 text-white' 
-                      : 'text-gray-300 hover:bg-gray-700 hover:text-white'}`
-                  }
-                >
-                  {tab.name}
-                </Tab>
+    <div className="container-fluid px-0" style={{ paddingTop: '60px' }}>
+      {/* Навигация по вкладкам */}
+      <ul className="nav nav-tabs bg-dark border-bottom border-dark justify-content-center sticky-top" style={{ top: '56px', zIndex: 1000 }}>
+        <li className="nav-item">
+          <a 
+            className={`nav-link ${activeTab === 'main' ? 'active bg-primary text-white' : 'text-white'}`}
+            onClick={() => setActiveTab('main')}
+            href="#main"
+          >
+            Главная
+          </a>
+        </li>
+        <li className="nav-item">
+          <a 
+            className={`nav-link ${activeTab === 'services' ? 'active bg-primary text-white' : 'text-white'}`}
+            onClick={() => setActiveTab('services')}
+            href="#services"
+          >
+            Услуги
+          </a>
+        </li>
+        <li className="nav-item">
+          <a 
+            className={`nav-link ${activeTab === 'about' ? 'active bg-primary text-white' : 'text-white'}`}
+            onClick={() => setActiveTab('about')}
+            href="#about"
+          >
+            О нас
+          </a>
+        </li>
+        <li className="nav-item">
+          <a 
+            className={`nav-link ${activeTab === 'contact' ? 'active bg-primary text-white' : 'text-white'}`}
+            onClick={() => setActiveTab('contact')}
+            href="#contact"
+          >
+            Контакты
+          </a>
+        </li>
+      </ul>
+
+      {/* Содержимое вкладок */}
+      <div className="tab-content bg-dark text-white min-vh-100">
+        
+        {/* Главная вкладка */}
+        <div 
+          className={`tab-pane fade ${activeTab === 'main' ? 'show active' : ''}`} 
+          id="main"
+        >
+          <div className="container py-5">
+            <div className="text-center mb-5">
+              <h1 className={`${montserrat.className} display-3 fw-bold mb-3`}>
+                <span className="text-danger">K.Consulting</span>
+              </h1>
+              <p className="lead fs-4 mb-4">
+                Профессиональные решения в мире криптовалют и блокчейна
+              </p>
+            </div>
+
+            {/* Статистика */}
+            <div className="row row-cols-2 row-cols-md-4 g-4 mb-5">
+              {stats.map((stat, index) => (
+                <div key={index} className="col">
+                  <div className="card h-100 bg-dark border border-secondary">
+                    <div className="card-body text-center">
+                      <h2 className="card-title text-danger fw-bold">{stat.number}</h2>
+                      <p className="card-text text-light">{stat.label}</p>
+                    </div>
+                  </div>
+                </div>
               ))}
-            </Tab.List>
-          </Tab.Group>
-        </div>
-      </div>
+            </div>
 
-      {/* Tab Panels for different sections */}
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-        <Tab.Group selectedIndex={selectedIndex} onChange={(index: number) => setSelectedIndex(index)}>
-          <Tab.Panels>
-            {/* Main Tab - Hero Section */}
-            <Tab.Panel>
-              <section id="main" className="pb-12">
-                <div className="text-center mb-12">
-                  <motion.h1 
-                    className={`${montserrat.className} text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-amber-500`}
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6 }}
-                  >
-                    K.Consulting
-                  </motion.h1>
-                  <motion.p 
-                    className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.6, delay: 0.2 }}
-                  >
-                    Профессиональные решения в мире криптовалют и блокчейна
-                  </motion.p>
-                </div>
-
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-12">
-                  {stats.map((stat, index) => (
-                    <motion.div
-                      key={index}
-                      className="bg-gray-800 p-4 rounded-lg text-center"
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.4, delay: 0.1 * index }}
-                    >
-                      <p className="text-red-500 text-2xl md:text-3xl font-bold">{stat.number}</p>
-                      <p className="text-gray-400 text-sm md:text-base">{stat.label}</p>
-                    </motion.div>
-                  ))}
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-8">
-                  <motion.div
-                    className="bg-gray-800 p-6 rounded-lg"
-                    initial={{ opacity: 0, x: -30 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.5 }}
-                  >
-                    <h2 className="text-2xl font-bold mb-4 text-red-500">Наша миссия</h2>
-                    <p className="text-gray-300">
+            {/* Информация о миссии и преимущества */}
+            <div className="row g-4">
+              <div className="col-md-6">
+                <div className="card h-100 bg-dark border border-secondary">
+                  <div className="card-body">
+                    <h3 className="card-title h4 text-danger mb-3">Наша миссия</h3>
+                    <p className="card-text">
                       Мы делаем мир криптовалют доступным и понятным для каждого. Наша команда экспертов
                       предлагает индивидуальные решения, которые помогут вам достичь успеха в динамичном
                       мире блокчейн-технологий.
                     </p>
-                  </motion.div>
-
-                  <motion.div
-                    className="bg-gray-800 p-6 rounded-lg"
-                    initial={{ opacity: 0, x: 30 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.5 }}
-                  >
-                    <h2 className="text-2xl font-bold mb-4 text-red-500">Почему мы</h2>
-                    <ul className="text-gray-300 space-y-2">
-                      <li className="flex items-start">
-                        <svg className="w-5 h-5 text-red-500 mr-2 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        <span>Многолетний опыт работы с криптовалютами</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="col-md-6">
+                <div className="card h-100 bg-dark border border-secondary">
+                  <div className="card-body">
+                    <h3 className="card-title h4 text-danger mb-3">Почему мы</h3>
+                    <ul className="list-group list-group-flush bg-transparent">
+                      <li className="list-group-item bg-dark text-light border-secondary">
+                        <i className="bi bi-check-circle-fill text-danger me-2"></i>
+                        Многолетний опыт работы с криптовалютами
                       </li>
-                      <li className="flex items-start">
-                        <svg className="w-5 h-5 text-red-500 mr-2 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        <span>Команда профессионалов мирового уровня</span>
+                      <li className="list-group-item bg-dark text-light border-secondary">
+                        <i className="bi bi-check-circle-fill text-danger me-2"></i>
+                        Команда профессионалов мирового уровня
                       </li>
-                      <li className="flex items-start">
-                        <svg className="w-5 h-5 text-red-500 mr-2 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        <span>Индивидуальный подход к каждому клиенту</span>
+                      <li className="list-group-item bg-dark text-light border-secondary">
+                        <i className="bi bi-check-circle-fill text-danger me-2"></i>
+                        Индивидуальный подход к каждому клиенту
                       </li>
                     </ul>
-                  </motion.div>
-                </div>
-              </section>
-            </Tab.Panel>
-
-            {/* Services Tab */}
-            <Tab.Panel>
-              <section id="services" className="pb-12">
-                <h2 className={`${montserrat.className} text-3xl md:text-4xl font-bold mb-8 text-center`}>Наши услуги</h2>
-                
-                <div className="grid md:grid-cols-12 gap-6">
-                  {/* Categories Sidebar */}
-                  <div className="md:col-span-3">
-                    <div className="bg-gray-800 rounded-lg overflow-hidden">
-                      <div className="p-4 border-b border-gray-700">
-                        <h3 className="font-medium text-lg text-red-500">Категории</h3>
-                      </div>
-                      <nav className="flex flex-col">
-                        {serviceCategories.map((category) => (
-                          <button
-                            key={category.id}
-                            onClick={() => setActiveCategory(category.id)}
-                            className={`p-4 text-left flex items-center transition-colors ${
-                              activeCategory === category.id 
-                                ? 'bg-gray-700 text-white' 
-                                : 'text-gray-300 hover:bg-gray-700 hover:text-white'
-                            }`}
-                          >
-                            <span className="mr-3">{category.icon}</span>
-                            <span>{category.name}</span>
-                          </button>
-                        ))}
-                      </nav>
-                    </div>
                   </div>
-
-                  {/* Services Content */}
-                  <div className="md:col-span-9">
-                    <div className="bg-gray-800 rounded-lg p-6">
-                      {serviceCategories.map((category) => (
-                        <div 
-                          key={category.id} 
-                          className={activeCategory === category.id ? 'block' : 'hidden'}
-                        >
-                          <div className="mb-6">
-                            <h3 className="text-2xl font-bold text-red-500 mb-2">{category.name}</h3>
-                            <p className="text-gray-300">{category.description}</p>
-                          </div>
-                          
-                          <div className="grid md:grid-cols-2 gap-6">
-                            {category.services.map((service, idx) => (
-                              <motion.div
-                                key={idx}
-                                className="bg-gray-700 rounded-lg p-5"
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.4, delay: 0.1 * idx }}
-                              >
-                                <div className="flex items-center mb-4">
-                                  {service.icon}
-                                  <h4 className="text-xl font-medium ml-3">{service.title}</h4>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Вкладка Услуги */}
+        <div 
+          className={`tab-pane fade ${activeTab === 'services' ? 'show active' : ''}`} 
+          id="services"
+        >
+          <div className="container py-5">
+            <h2 className={`${montserrat.className} text-center display-5 mb-5`}>Наши услуги</h2>
+            
+            <div className="row">
+              {/* Боковая панель категорий */}
+              <div className="col-lg-3 mb-4">
+                <div className="list-group">
+                  {serviceCategories.map((category) => (
+                    <button
+                      key={category.id}
+                      type="button"
+                      className={`list-group-item list-group-item-action d-flex align-items-center ${
+                        activeCategory === category.id 
+                          ? 'active bg-primary' 
+                          : 'bg-dark text-white'
+                      }`}
+                      onClick={() => setActiveCategory(category.id)}
+                    >
+                      <span className="me-2" style={{ width: '24px', height: '24px' }}>
+                        {category.icon}
+                      </span>
+                      <span>{category.name}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Содержимое категорий */}
+              <div className="col-lg-9">
+                {serviceCategories.map((category) => (
+                  <div 
+                    key={category.id} 
+                    className={activeCategory === category.id ? 'd-block' : 'd-none'}
+                  >
+                    <div className="card bg-dark border border-secondary mb-4">
+                      <div className="card-body">
+                        <h3 className="card-title h3 text-danger mb-3">{category.name}</h3>
+                        <p className="card-text mb-4">{category.description}</p>
+                        
+                        <div className="row row-cols-1 row-cols-md-2 g-4">
+                          {category.services.map((service, idx) => (
+                            <div key={idx} className="col">
+                              <div className="card h-100 bg-secondary text-white">
+                                <div className="card-body">
+                                  <div className="d-flex align-items-center mb-3">
+                                    <span className="me-2 text-danger">
+                                      {service.icon}
+                                    </span>
+                                    <h5 className="card-title mb-0">{service.title}</h5>
+                                  </div>
+                                  <p className="card-text">{service.description}</p>
+                                  <ul className="list-group list-group-flush bg-transparent">
+                                    {service.items.map((item, i) => (
+                                      <li key={i} className="list-group-item bg-transparent border-secondary text-white">
+                                        <i className="bi bi-check-circle-fill text-danger me-2"></i>
+                                        {item}
+                                      </li>
+                                    ))}
+                                  </ul>
                                 </div>
-                                <p className="text-gray-300 mb-4">{service.description}</p>
-                                <ul className="space-y-2">
-                                  {service.items.map((item, i) => (
-                                    <li key={i} className="flex items-start">
-                                      <svg className="w-5 h-5 text-red-500 mr-2 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                                      </svg>
-                                      <span className="text-gray-300 text-sm">{item}</span>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </motion.div>
-                            ))}
-                          </div>
+                              </div>
+                            </div>
+                          ))}
                         </div>
-                      ))}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </section>
-            </Tab.Panel>
-
-            {/* About Us Tab */}
-            <Tab.Panel>
-              <section id="about" className="pb-12">
-                <h2 className={`${montserrat.className} text-3xl md:text-4xl font-bold mb-8 text-center`}>О нас</h2>
-                
-                <div className="grid md:grid-cols-2 gap-8 mb-12">
-                  <div className="bg-gray-800 rounded-lg p-6">
-                    <h3 className="text-2xl font-bold text-red-500 mb-4">Наша история</h3>
-                    <p className="text-gray-300 mb-4">
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Вкладка О нас */}
+        <div 
+          className={`tab-pane fade ${activeTab === 'about' ? 'show active' : ''}`} 
+          id="about"
+        >
+          <div className="container py-5">
+            <h2 className={`${montserrat.className} text-center display-5 mb-5`}>О нас</h2>
+            
+            <div className="row g-4 mb-5">
+              <div className="col-md-6">
+                <div className="card h-100 bg-dark border border-secondary">
+                  <div className="card-body">
+                    <h3 className="card-title h4 text-danger mb-3">Наша история</h3>
+                    <p className="card-text mb-3">
                       K.Consulting был основан в 2018 году группой экспертов в области криптовалют и блокчейн-технологий.
                       С тех пор мы выросли в полноценную консалтинговую компанию, обслуживающую клиентов по всему миру.
                     </p>
-                    <p className="text-gray-300">
+                    <p className="card-text">
                       За годы работы мы помогли десяткам проектов успешно запуститься и масштабироваться,
                       а сотни частных инвесторов смогли значительно увеличить свой капитал благодаря нашим стратегиям.
                     </p>
                   </div>
-                  <div className="bg-gray-800 rounded-lg p-6">
-                    <h3 className="text-2xl font-bold text-red-500 mb-4">Наши ценности</h3>
-                    <ul className="space-y-3">
-                      <li className="flex items-start">
-                        <svg className="w-5 h-5 text-red-500 mr-3 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                        </svg>
-                        <div>
-                          <span className="font-medium text-white">Безопасность</span>
-                          <p className="text-gray-300 text-sm">Безопасность активов и данных наших клиентов — наш главный приоритет</p>
-                        </div>
-                      </li>
-                      <li className="flex items-start">
-                        <svg className="w-5 h-5 text-red-500 mr-3 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                        </svg>
-                        <div>
-                          <span className="font-medium text-white">Инновации</span>
-                          <p className="text-gray-300 text-sm">Мы постоянно исследуем новые технологии и подходы для достижения лучших результатов</p>
-                        </div>
-                      </li>
-                    </ul>
+                </div>
+              </div>
+              
+              <div className="col-md-6">
+                <div className="card h-100 bg-dark border border-secondary">
+                  <div className="card-body">
+                    <h3 className="card-title h4 text-danger mb-3">Наши ценности</h3>
+                    <div className="d-flex mb-3">
+                      <div className="fs-4 text-danger me-3">
+                        <i className="bi bi-shield-check"></i>
+                      </div>
+                      <div>
+                        <h4 className="h5 text-white">Безопасность</h4>
+                        <p className="small text-light">Безопасность активов и данных наших клиентов — наш главный приоритет</p>
+                      </div>
+                    </div>
+                    <div className="d-flex">
+                      <div className="fs-4 text-danger me-3">
+                        <i className="bi bi-lightning-charge"></i>
+                      </div>
+                      <div>
+                        <h4 className="h5 text-white">Инновации</h4>
+                        <p className="small text-light">Мы постоянно исследуем новые технологии и подходы для достижения лучших результатов</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </section>
-            </Tab.Panel>
-
-            {/* Contact Tab */}
-            <Tab.Panel>
-              <section id="contact" className="pb-12">
-                <h2 className={`${montserrat.className} text-3xl md:text-4xl font-bold mb-8 text-center`}>Свяжитесь с нами</h2>
-                
-                <div className="grid md:grid-cols-2 gap-8">
-                  <div className="bg-gray-800 rounded-lg p-6">
-                    <h3 className="text-2xl font-bold text-red-500 mb-4">Контактная информация</h3>
+              </div>
+            </div>
+            
+            <div className="card bg-dark border border-secondary">
+              <div className="card-body text-center">
+                <h3 className="card-title h4 text-danger mb-4">Наши достижения</h3>
+                <div className="row row-cols-2 row-cols-md-4 g-3">
+                  {[
+                    { title: "ICO проектов", value: "15+" },
+                    { title: "Запущенных DeFi платформ", value: "8+" },
+                    { title: "NFT коллекций", value: "20+" },
+                    { title: "Клиентов", value: "200+" }
+                  ].map((item, idx) => (
+                    <div key={idx} className="col">
+                      <div className="p-3 bg-secondary rounded">
+                        <h4 className="h2 text-danger fw-bold mb-2">{item.value}</h4>
+                        <p className="small text-white">{item.title}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Вкладка Контакты */}
+        <div 
+          className={`tab-pane fade ${activeTab === 'contact' ? 'show active' : ''}`} 
+          id="contact"
+        >
+          <div className="container py-5">
+            <h2 className={`${montserrat.className} text-center display-5 mb-5`}>Свяжитесь с нами</h2>
+            
+            <div className="row g-4">
+              <div className="col-lg-6">
+                <div className="card bg-dark border border-secondary h-100">
+                  <div className="card-body">
+                    <h3 className="card-title h4 text-danger mb-4">Контактная информация</h3>
                     
-                    <div className="space-y-4">
-                      <div className="flex items-start">
-                        <svg className="w-5 h-5 text-red-500 mr-3 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                        </svg>
+                    <div className="mb-4">
+                      <div className="d-flex align-items-center mb-3">
+                        <i className="bi bi-telephone-fill text-danger fs-4 me-3"></i>
                         <div>
-                          <span className="font-medium text-white">Телефон</span>
-                          <p className="text-gray-300">+7 (495) 123-45-67</p>
+                          <h4 className="h6 text-white mb-1">Телефон</h4>
+                          <p className="mb-0">+7 (495) 123-45-67</p>
                         </div>
                       </div>
                       
-                      <div className="flex items-start">
-                        <svg className="w-5 h-5 text-red-500 mr-3 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                        </svg>
+                      <div className="d-flex align-items-center mb-3">
+                        <i className="bi bi-envelope-fill text-danger fs-4 me-3"></i>
                         <div>
-                          <span className="font-medium text-white">Email</span>
-                          <p className="text-gray-300">info@kconsulting.com</p>
+                          <h4 className="h6 text-white mb-1">Email</h4>
+                          <p className="mb-0">info@kconsulting.com</p>
+                        </div>
+                      </div>
+                      
+                      <div className="d-flex align-items-center">
+                        <i className="bi bi-geo-alt-fill text-danger fs-4 me-3"></i>
+                        <div>
+                          <h4 className="h6 text-white mb-1">Адрес</h4>
+                          <p className="mb-0">г. Москва, ул. Примерная, д. 123, офис 456</p>
                         </div>
                       </div>
                     </div>
                     
-                    <div className="mt-8">
-                      <h4 className="font-medium text-white mb-3">Мы в социальных сетях</h4>
-                      <div className="flex space-x-4">
-                        <a href="#" className="text-red-500 hover:text-red-400">
-                          <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
-                          </svg>
+                    <div>
+                      <h4 className="h6 text-white mb-3">Мы в социальных сетях</h4>
+                      <div className="d-flex">
+                        <a href="#" className="btn btn-outline-danger me-2">
+                          <i className="bi bi-telegram"></i>
+                        </a>
+                        <a href="#" className="btn btn-outline-danger me-2">
+                          <i className="bi bi-twitter-x"></i>
+                        </a>
+                        <a href="#" className="btn btn-outline-danger">
+                          <i className="bi bi-instagram"></i>
                         </a>
                       </div>
                     </div>
                   </div>
-                  
-                  <div className="bg-gray-800 rounded-lg p-6">
-                    <h3 className="text-2xl font-bold text-red-500 mb-4">Напишите нам</h3>
+                </div>
+              </div>
+              
+              <div className="col-lg-6">
+                <div className="card bg-dark border border-secondary h-100">
+                  <div className="card-body">
+                    <h3 className="card-title h4 text-danger mb-4">Напишите нам</h3>
                     
-                    <form className="space-y-4">
-                      <div>
-                        <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-1">Имя</label>
-                        <input
-                          type="text"
-                          id="name"
-                          className="w-full bg-gray-700 border border-gray-600 rounded-md py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+                    <form>
+                      <div className="mb-3">
+                        <label htmlFor="name" className="form-label">Имя</label>
+                        <input 
+                          type="text" 
+                          className="form-control bg-secondary text-white border-dark" 
+                          id="name" 
                           placeholder="Ваше имя"
                         />
                       </div>
                       
-                      <div>
-                        <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">Email</label>
-                        <input
-                          type="email"
-                          id="email"
-                          className="w-full bg-gray-700 border border-gray-600 rounded-md py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+                      <div className="mb-3">
+                        <label htmlFor="email" className="form-label">Email</label>
+                        <input 
+                          type="email" 
+                          className="form-control bg-secondary text-white border-dark" 
+                          id="email" 
                           placeholder="your@email.com"
                         />
                       </div>
                       
-                      <button
-                        type="submit"
-                        className="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
-                      >
+                      <div className="mb-4">
+                        <label htmlFor="message" className="form-label">Сообщение</label>
+                        <textarea 
+                          className="form-control bg-secondary text-white border-dark" 
+                          id="message" 
+                          rows={5}
+                          placeholder="Ваше сообщение..."
+                        ></textarea>
+                      </div>
+                      
+                      <button type="submit" className="btn btn-danger w-100">
                         Отправить
                       </button>
                     </form>
                   </div>
                 </div>
-              </section>
-            </Tab.Panel>
-          </Tab.Panels>
-        </Tab.Group>
+              </div>
+            </div>
+          </div>
+        </div>
+        
       </div>
+      
+      {/* Footer */}
+      <footer className="bg-black py-4 mt-auto">
+        <div className="container">
+          <div className="row align-items-center">
+            <div className="col-md-6 text-center text-md-start mb-3 mb-md-0">
+              <span className="text-white">&copy; 2024 K.Consulting. Все права защищены.</span>
+            </div>
+            <div className="col-md-6 text-center text-md-end">
+              <Link href="/privacy" className="text-light mx-2">Политика конфиденциальности</Link>
+              <Link href="/terms" className="text-light mx-2">Условия использования</Link>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 } 
