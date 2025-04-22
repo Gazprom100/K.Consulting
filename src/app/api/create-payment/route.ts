@@ -28,9 +28,63 @@ interface WataSuccessResponse {
   orderId?: string;
 }
 
+// Функция для прямой проверки доступности API Wata с минимумом параметров
+async function testWataApiConnection() {
+  try {
+    // Делаем минимальный запрос для проверки соединения
+    const response = await fetch(`${WATA_API_URL}/payment-links`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${WATA_API_TOKEN}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        amount: 1,
+        currency: 'RUB',
+        orderId: `test_${Date.now()}`,
+        orderDescription: 'API Connection Test',
+        successUrl: 'https://example.com/success',
+        failUrl: 'https://example.com/fail'
+      })
+    });
+
+    // Проверяем только получение ответа, не обрабатываем результат
+    const responseText = await response.text();
+    console.log('Test API connection status:', response.status);
+    console.log('Test API response headers:', Object.fromEntries(response.headers.entries()));
+    console.log('Test API raw response:', responseText);
+
+    return {
+      success: response.ok,
+      status: response.status,
+      text: responseText
+    };
+  } catch (error: any) {
+    console.error('Error testing Wata API connection:', error);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+}
+
 export async function POST(request: Request) {
   try {
     console.log('Начало обработки запроса на создание платежа');
+
+    // Сначала проверим доступность API Wata
+    console.log('Тестирование соединения с Wata API...');
+    const testResult = await testWataApiConnection();
+    console.log('Результат теста соединения:', testResult);
+
+    if (!testResult.success) {
+      return NextResponse.json({ 
+        error: 'Ошибка при подключении к платежному сервису', 
+        details: 'API недоступен',
+        testResult 
+      }, { status: 503 });
+    }
     
     // Получаем данные из запроса
     const body = await request.json();
@@ -47,12 +101,12 @@ export async function POST(request: Request) {
     const orderId = `donate_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
     console.log('Сгенерирован orderId:', orderId);
     
-    // Определяем URL для редиректов на основе заголовка хоста
-    const host = request.headers.get('host') || 'localhost:3000';
-    const protocol = host.includes('localhost') ? 'http' : 'https';
-    const baseUrl = `${protocol}://${host}`;
+    // Определяем URL для редиректов
+    // Для Netlify используем относительные пути
+    const successUrl = '/payment-success';
+    const failUrl = '/payment-failed';
     
-    console.log('Используемый baseUrl для редиректов:', baseUrl);
+    console.log('Используемые URL для редиректов:', { successUrl, failUrl });
     
     // Формируем данные для запроса согласно документации Wata
     const requestData = {
@@ -60,8 +114,8 @@ export async function POST(request: Request) {
       currency: 'RUB',
       orderId: orderId,
       orderDescription: 'Донат для K.Consulting',
-      successUrl: `${baseUrl}/payment-success`,
-      failUrl: `${baseUrl}/payment-failed`
+      successUrl,
+      failUrl
     };
     
     console.log('Отправка запроса к Wata API:', {
@@ -87,13 +141,18 @@ export async function POST(request: Request) {
       console.log('Заголовки ответа:', Object.fromEntries(response.headers.entries()));
       console.log('Сырой ответ от Wata API:', responseText);
       
-      let data: WataSuccessResponse | WataErrorResponse;
+      // Пытаемся распарсить JSON, но если это не JSON, то возвращаем сырой текст
+      let data;
       try {
         data = JSON.parse(responseText);
+        console.log('Успешно распарсили JSON ответ');
       } catch (e) {
         console.error('Ошибка парсинга JSON ответа:', e);
         return NextResponse.json(
-          { error: 'Ошибка обработки ответа от платежного сервиса' }, 
+          { 
+            error: 'Ошибка обработки ответа от платежного сервиса',
+            rawResponse: responseText.substring(0, 500) // Включаем часть сырого ответа для диагностики
+          }, 
           { status: 500 }
         );
       }
@@ -108,20 +167,21 @@ export async function POST(request: Request) {
       
       console.log('Успешный ответ от Wata API:', data);
       
-      // Приведение типа для TypeScript
-      const successData = data as WataSuccessResponse;
-      
-      if (!successData.paymentUrl) {
+      // Проверяем наличие paymentUrl в ответе API
+      if (!data || typeof data !== 'object' || !data.paymentUrl) {
         console.error('В ответе отсутствует paymentUrl:', data);
         return NextResponse.json(
-          { error: 'В ответе API отсутствует платежная ссылка' }, 
+          { 
+            error: 'В ответе API отсутствует платежная ссылка',
+            responseData: data
+          }, 
           { status: 500 }
         );
       }
       
       return NextResponse.json({ 
-        paymentUrl: successData.paymentUrl, 
-        uuid: successData.uuid,
+        paymentUrl: data.paymentUrl, 
+        uuid: data.uuid || null,
         message: 'Платежная ссылка успешно создана'
       });
       
@@ -130,7 +190,8 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { 
           error: 'Ошибка при обращении к платежному сервису', 
-          details: fetchError.message || 'Неизвестная ошибка сети'
+          details: fetchError.message || 'Неизвестная ошибка сети',
+          stack: fetchError.stack
         }, 
         { status: 500 }
       );
@@ -140,7 +201,8 @@ export async function POST(request: Request) {
     return NextResponse.json(
       { 
         error: 'Внутренняя ошибка сервера', 
-        details: error.message || 'Неизвестная ошибка'
+        details: error.message || 'Неизвестная ошибка',
+        stack: error.stack
       }, 
       { status: 500 }
     );

@@ -11,7 +11,8 @@ export default function DonateModal({ isOpen, onClose }: DonateModalProps) {
   const [amount, setAmount] = useState('100');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const [retry, setRetry] = useState(false); // Для отслеживания повторной попытки
+  const [retry, setRetry] = useState(false);
+  const [debug, setDebug] = useState<any>(null); // Для отображения отладочной информации
 
   // Предустановленные суммы для выбора
   const presetAmounts = ['100', '500', '1000', '5000'];
@@ -19,6 +20,7 @@ export default function DonateModal({ isOpen, onClose }: DonateModalProps) {
   // Очистка ошибки при изменении суммы
   const handleAmountChange = (newAmount: string) => {
     if (error) setError('');
+    if (debug) setDebug(null);
     setAmount(newAmount.replace(/[^0-9]/g, ''));
   };
 
@@ -27,6 +29,7 @@ export default function DonateModal({ isOpen, onClose }: DonateModalProps) {
     e.preventDefault();
     setError('');
     setRetry(false);
+    setDebug(null);
     
     // Проверка правильности введенной суммы
     const numAmount = parseFloat(amount);
@@ -58,14 +61,16 @@ export default function DonateModal({ isOpen, onClose }: DonateModalProps) {
       let data;
       try {
         data = JSON.parse(responseText);
+        setDebug(data); // Сохраняем для отладки
       } catch (e) {
         console.error('Ошибка парсинга JSON:', e);
+        setDebug({ rawResponse: responseText });
         throw new Error('Получен некорректный ответ от сервера. Пожалуйста, попробуйте позже.');
       }
       
       if (!response.ok) {
         const errorMessage = data.error || 'Неизвестная ошибка';
-        const errorDetails = data.details ? JSON.stringify(data.details) : '';
+        const errorDetails = data.details ? (typeof data.details === 'string' ? data.details : JSON.stringify(data.details)) : '';
         console.error('Ошибка API:', errorMessage, errorDetails);
         throw new Error(`${errorMessage}${errorDetails ? ': ' + errorDetails : ''}`);
       }
@@ -93,6 +98,7 @@ export default function DonateModal({ isOpen, onClose }: DonateModalProps) {
   const handleRetry = () => {
     setError('');
     setRetry(false);
+    setDebug(null);
     handleSubmit({ preventDefault: () => {} } as React.FormEvent);
   };
 
@@ -192,6 +198,18 @@ export default function DonateModal({ isOpen, onClose }: DonateModalProps) {
             </button>
           </div>
         </form>
+        
+        {/* Отладочная информация */}
+        {debug && (
+          <div className="mt-4 pt-4 border-top border-secondary">
+            <details>
+              <summary className="text-muted small">Техническая информация</summary>
+              <pre className="mt-2 p-2 bg-dark text-light small" style={{ maxHeight: '200px', overflow: 'auto' }}>
+                {JSON.stringify(debug, null, 2)}
+              </pre>
+            </details>
+          </div>
+        )}
       </div>
     </>
   );
