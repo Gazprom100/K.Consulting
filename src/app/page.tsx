@@ -248,6 +248,14 @@ export default function Home() {
   const [activeCategory, setActiveCategory] = useState('investment');
   const [isDonateModalOpen, setIsDonateModalOpen] = useState(false);
   
+  const handleOpenDonateModal = () => {
+    setIsDonateModalOpen(true);
+  };
+
+  const handleCloseDonateModal = () => {
+    setIsDonateModalOpen(false);
+  };
+
   // Добавляем Bootstrap JS на стороне клиента
   useEffect(() => {
     if (typeof document !== 'undefined') {
@@ -315,7 +323,7 @@ export default function Home() {
               </p>
               <button 
                 className="btn btn-danger btn-lg"
-                onClick={() => setIsDonateModalOpen(true)}
+                onClick={handleOpenDonateModal}
                 id="donate"
               >
                 <i className="bi bi-heart-fill me-2"></i> Отправить донат
@@ -334,7 +342,7 @@ export default function Home() {
                   </div>
                 </div>
               ))}
-            </div>
+          </div>
 
             {/* Информация о миссии и преимущества */}
             <div className="row g-4">
@@ -349,8 +357,8 @@ export default function Home() {
                     </p>
                   </div>
                 </div>
-              </div>
-              
+          </div>
+
               <div className="col-md-6">
                 <div className="card h-100 bg-dark border border-secondary">
                   <div className="card-body">
@@ -388,31 +396,31 @@ export default function Home() {
               {/* Боковая панель категорий */}
               <div className="col-lg-3 mb-4">
                 <div className="list-group">
-                  {serviceCategories.map((category) => (
-                    <button
-                      key={category.id}
+                {serviceCategories.map((category) => (
+                  <button
+                    key={category.id}
                       type="button"
                       className={`list-group-item list-group-item-action d-flex align-items-center ${
-                        activeCategory === category.id 
+                      activeCategory === category.id
                           ? 'active bg-primary' 
                           : 'bg-dark text-white'
-                      }`}
-                      onClick={() => setActiveCategory(category.id)}
-                    >
+                    }`}
+                    onClick={() => setActiveCategory(category.id)}
+                  >
                       <span className="me-2" style={{ width: '24px', height: '24px' }}>
                         {category.icon}
                       </span>
                       <span>{category.name}</span>
-                    </button>
-                  ))}
-                </div>
+                  </button>
+                ))}
               </div>
-              
+            </div>
+
               {/* Содержимое категорий */}
               <div className="col-lg-9">
-                {serviceCategories.map((category) => (
-                  <div 
-                    key={category.id} 
+            {serviceCategories.map((category) => (
+              <div
+                key={category.id}
                     className={activeCategory === category.id ? 'd-block' : 'd-none'}
                   >
                     <div className="card bg-dark border border-secondary mb-4">
@@ -427,24 +435,24 @@ export default function Home() {
                                 <div className="card-body">
                                   <div className="d-flex align-items-center mb-3">
                                     <span className="me-2 text-danger">
-                                      {service.icon}
+                            {service.icon}
                                     </span>
                                     <h5 className="card-title mb-0">{service.title}</h5>
-                                  </div>
+                          </div>
                                   <p className="card-text">{service.description}</p>
                                   <ul className="list-group list-group-flush bg-transparent">
                                     {service.items.map((item, i) => (
                                       <li key={i} className="list-group-item bg-transparent border-secondary text-white">
                                         <i className="bi bi-check-circle-fill text-danger me-2"></i>
                                         {item}
-                                      </li>
-                                    ))}
-                                  </ul>
-                                </div>
-                              </div>
-                            </div>
+                            </li>
                           ))}
-                        </div>
+                        </ul>
+                      </div>
+                </div>
+              </div>
+            ))}
+          </div>
                       </div>
                     </div>
                   </div>
@@ -477,8 +485,8 @@ export default function Home() {
                     </p>
                   </div>
                 </div>
-              </div>
-              
+            </div>
+
               <div className="col-md-6">
                 <div className="card h-100 bg-dark border border-secondary">
                   <div className="card-body">
@@ -642,7 +650,7 @@ export default function Home() {
           <div className="row align-items-center">
             <div className="col-md-6 text-center text-md-start mb-3 mb-md-0">
               <span className="text-white">&copy; 2024 K.Consulting. Все права защищены.</span>
-            </div>
+          </div>
             <div className="col-md-6 text-center text-md-end">
               <Link href="/privacy" className="text-light mx-2">Политика конфиденциальности</Link>
               <Link href="/terms" className="text-light mx-2">Условия использования</Link>
@@ -654,7 +662,7 @@ export default function Home() {
       {/* Модальное окно для доната */}
       <DonateModal 
         isOpen={isDonateModalOpen} 
-        onClose={() => setIsDonateModalOpen(false)} 
+        onClose={handleCloseDonateModal} 
       />
     </div>
   );

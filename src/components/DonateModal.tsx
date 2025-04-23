@@ -1,300 +1,223 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 
 interface DonateModalProps {
-  isOpen: boolean;
   onClose: () => void;
+  isOpen?: boolean;
 }
 
-export default function DonateModal({ isOpen, onClose }: DonateModalProps) {
-  const [amount, setAmount] = useState('100');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [retry, setRetry] = useState(false);
-  const [debug, setDebug] = useState<any>(null); // Для отображения отладочной информации
-  const [showAdvanced, setShowAdvanced] = useState(false); // Для показа дополнительных опций
+export default function DonateModal({ onClose, isOpen = true }: DonateModalProps) {
+  const [donationAmount, setDonationAmount] = useState<number | ''>('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
-  // Предустановленные суммы для выбора
-  const presetAmounts = ['100', '500', '1000', '5000'];
-
-  // Очистка ошибки при изменении суммы
-  const handleAmountChange = (newAmount: string) => {
-    if (error) setError('');
-    if (debug) setDebug(null);
-    setAmount(newAmount.replace(/[^0-9]/g, ''));
+  const modalVariants = {
+    hidden: { opacity: 0 },
+    visible: { 
+      opacity: 1,
+      transition: { 
+        duration: 0.3,
+        when: "beforeChildren"
+      }
+    },
+    exit: {
+      opacity: 0,
+      transition: { 
+        duration: 0.2,
+        when: "afterChildren"
+      }
+    }
   };
 
-  // Обработчик отправки формы
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setRetry(false);
-    setDebug(null);
+  const contentVariants = {
+    hidden: { y: 50, opacity: 0 },
+    visible: { 
+      y: 0, 
+      opacity: 1,
+      transition: { 
+        duration: 0.4,
+        type: "spring", 
+        stiffness: 500, 
+        damping: 25 
+      }
+    },
+    exit: { 
+      y: 50, 
+      opacity: 0,
+      transition: { 
+        duration: 0.3
+      }
+    }
+  };
+
+  // Close modal when pressing ESC key
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
     
-    // Проверка правильности введенной суммы
-    const numAmount = parseFloat(amount);
-    if (!amount || isNaN(numAmount) || numAmount <= 0) {
-      setError('Пожалуйста, введите корректную сумму');
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [onClose]);
+
+  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget) onClose();
+  };
+
+  const handleAmountClick = (amount: number) => {
+    setDonationAmount(amount);
+    setError(null);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value === '') {
+      setDonationAmount('');
       return;
     }
+    
+    const numValue = parseFloat(value);
+    if (!isNaN(numValue) && numValue >= 0) {
+      setDonationAmount(numValue);
+      setError(null);
+    }
+  };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!donationAmount || donationAmount < 1) {
+      setError('Сумма должна быть не менее 1 ₽');
+      return;
+    }
+    
+    setIsSubmitting(true);
+    setError(null);
+    
     try {
-      setIsLoading(true);
-      console.log('Отправка запроса на создание платежа:', { amount });
-      
-      // Отправка запроса на создание платежа
-      const startTime = Date.now();
       const response = await fetch('/api/create-payment', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ amount }),
+        body: JSON.stringify({ amount: donationAmount }),
       });
-      const endTime = Date.now();
-      const requestDuration = endTime - startTime;
-
-      console.log('Получен ответ со статусом:', response.status);
-      console.log('Время запроса:', requestDuration, 'мс');
       
-      // Получаем текст ответа
-      const responseText = await response.text();
-      console.log('Текст ответа:', responseText);
-      
-      // Попытка парсинга JSON
-      let data;
-      try {
-        data = JSON.parse(responseText);
-        setDebug({
-          status: response.status,
-          headers: Object.fromEntries(response.headers.entries()),
-          data,
-          requestDuration
-        });
-      } catch (e: any) {
-        console.error('Ошибка парсинга JSON:', e);
-        setDebug({
-          status: response.status,
-          headers: Object.fromEntries(response.headers.entries()),
-          rawResponse: responseText,
-          error: e.message,
-          requestDuration
-        });
-        throw new Error('Получен некорректный ответ от сервера. Пожалуйста, попробуйте позже.');
-      }
+      const data = await response.json();
       
       if (!response.ok) {
-        const errorMessage = data.error || 'Неизвестная ошибка';
-        let errorDetails = '';
-        
-        // Извлекаем детали ошибки в человекочитаемом формате
-        if (data.details) {
-          if (typeof data.details === 'string') {
-            errorDetails = data.details;
-          } else if (typeof data.details === 'object') {
-            errorDetails = JSON.stringify(data.details);
-          }
-        }
-        
-        // Проверяем на наличие testResult для отображения подробностей
-        if (data.testResult) {
-          setDebug({
-            ...data,
-            status: response.status,
-            requestDuration
-          });
-        }
-        
-        console.error('Ошибка API:', errorMessage, errorDetails);
-        throw new Error(`${errorMessage}${errorDetails ? ': ' + errorDetails : ''}`);
+        throw new Error(data.error || 'Ошибка создания платежа');
       }
       
-      if (!data.paymentUrl) {
-        console.error('В ответе отсутствует платежная ссылка:', data);
-        throw new Error('Сервер не вернул платежную ссылку. Пожалуйста, попробуйте позже.');
+      if (data.paymentUrl) {
+        window.location.href = data.paymentUrl;
+      } else {
+        throw new Error('Не получена ссылка на оплату');
       }
-      
-      console.log('Успешно получена платежная ссылка:', data.paymentUrl);
-      
-      // Перенаправление на страницу оплаты
-      window.location.href = data.paymentUrl;
-      
-    } catch (error: any) {
-      console.error('Ошибка при создании платежа:', error);
-      setError(error.message || 'Произошла ошибка. Пожалуйста, попробуйте снова позже.');
-      setRetry(true); // Включаем возможность повторной попытки
-    } finally {
-      setIsLoading(false);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Произошла ошибка при создании платежа');
+      setIsSubmitting(false);
     }
   };
-
-  // Повторить попытку
-  const handleRetry = () => {
-    setError('');
-    setRetry(false);
-    setDebug(null);
-    handleSubmit({ preventDefault: () => {} } as React.FormEvent);
-  };
-
-  // Тестовый запрос напрямую к Wata API
-  const handleTestDirectApi = async () => {
-    try {
-      setIsLoading(true);
-      setError('');
-      setDebug(null);
-      
-      // Открываем вкладку с документацией API
-      window.open('https://wata.pro/api', '_blank');
-      
-      setDebug({
-        message: 'Открыта документация API для проверки настроек',
-        timestamp: new Date().toISOString()
-      });
-      
-    } catch (e: any) {
-      setError(`Ошибка при тесте API: ${e.message}`);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  if (!isOpen) return null;
 
   return (
-    <>
-      {/* Затемнение заднего фона */}
-      <div 
-        className="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-75"
-        style={{ zIndex: 1050 }}
-        onClick={onClose}
-      />
-      
-      {/* Модальное окно */}
-      <div 
-        className="position-fixed top-50 start-50 translate-middle bg-dark border border-secondary rounded-3 p-4"
-        style={{ zIndex: 1055, width: '95%', maxWidth: '450px', maxHeight: '90vh', overflow: 'auto' }}
-      >
-        <div className="d-flex justify-content-between align-items-center mb-4">
-          <h5 className="m-0 text-white">Отправить донат</h5>
-          <button 
-            type="button" 
-            className="btn-close btn-close-white" 
-            onClick={onClose}
-            aria-label="Close"
-          />
-        </div>
-        
-        {error && (
-          <div className="alert alert-danger mb-4" role="alert">
-            <p className="mb-2">{error}</p>
-            <div className="d-flex gap-2 mt-2">
-              {retry && (
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 backdrop-blur-sm p-4"
+          variants={modalVariants}
+          initial="hidden"
+          animate="visible"
+          exit="exit"
+          onClick={handleBackdropClick}
+        >
+          <motion.div 
+            className="w-full max-w-md bg-gray-900 rounded-lg shadow-xl border border-blue-500/20"
+            variants={contentVariants}
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold text-white">Поддержать проект</h2>
                 <button 
-                  className="btn btn-sm btn-danger" 
-                  onClick={handleRetry}
-                  disabled={isLoading}
+                  onClick={onClose} 
+                  className="text-gray-400 hover:text-white transition-colors"
+                  disabled={isSubmitting}
                 >
-                  Попробовать снова
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </button>
-              )}
-              <button 
-                className="btn btn-sm btn-outline-danger"
-                onClick={() => setShowAdvanced(!showAdvanced)}
-              >
-                {showAdvanced ? 'Скрыть' : 'Подробнее'}
-              </button>
+              </div>
+              
+              <form onSubmit={handleSubmit}>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-3 gap-2">
+                    {[100, 500, 1000].map(amount => (
+                      <button
+                        key={amount}
+                        type="button"
+                        className={`py-2 px-4 rounded-md transition-all ${
+                          donationAmount === amount 
+                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/50' 
+                            : 'bg-gray-800 text-gray-200 hover:bg-gray-700'
+                        }`}
+                        onClick={() => handleAmountClick(amount)}
+                        disabled={isSubmitting}
+                      >
+                        {amount} ₽
+                      </button>
+                    ))}
+                  </div>
+                  
+                  <div className="mt-4">
+                    <label className="block text-sm font-medium text-gray-300 mb-1">
+                      Другая сумма
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={donationAmount === '' ? '' : donationAmount}
+                        onChange={handleInputChange}
+                        className="block w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-md focus:ring-blue-500 focus:border-blue-500 text-white"
+                        placeholder="Введите сумму"
+                        disabled={isSubmitting}
+                      />
+                      <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                        <span className="text-gray-400">₽</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {error && (
+                    <div className="text-red-500 text-sm mt-2">{error}</div>
+                  )}
+                  
+                  <button
+                    type="submit"
+                    className="w-full py-2 px-4 mt-4 cyber-button"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <div className="flex items-center justify-center">
+                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Обработка...
+                      </div>
+                    ) : 'Отправить'}
+                  </button>
+                </div>
+              </form>
             </div>
-          </div>
-        )}
-        
-        {/* Расширенные настройки (при наличии ошибки) */}
-        {showAdvanced && (
-          <div className="mb-4 p-3 border border-secondary rounded">
-            <h6 className="text-light mb-3">Диагностика</h6>
-            <button 
-              className="btn btn-sm btn-outline-light mb-3" 
-              onClick={handleTestDirectApi}
-              disabled={isLoading}
-            >
-              Открыть документацию API
-            </button>
-            
-            <div className="small text-light">
-              <p className="mb-1">API URL: api.wata.pro</p>
-              <p className="mb-1">Текущий сервер: <span className="text-info">{window.location.host}</span></p>
-            </div>
-          </div>
-        )}
-        
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label htmlFor="amount" className="form-label">Сумма (RUB)</label>
-            <div className="input-group">
-              <input 
-                type="text" 
-                className="form-control bg-secondary text-white border-dark" 
-                id="amount"
-                value={amount}
-                onChange={(e) => handleAmountChange(e.target.value)}
-                placeholder="Введите сумму"
-                required
-              />
-              <span className="input-group-text bg-secondary text-white border-dark">₽</span>
-            </div>
-          </div>
-          
-          <div className="mb-4">
-            <div className="d-flex flex-wrap gap-2">
-              {presetAmounts.map((preset) => (
-                <button
-                  key={preset}
-                  type="button"
-                  className={`btn ${amount === preset ? 'btn-danger' : 'btn-outline-danger'}`}
-                  onClick={() => handleAmountChange(preset)}
-                >
-                  {preset} ₽
-                </button>
-              ))}
-            </div>
-          </div>
-          
-          <div className="d-flex justify-content-end">
-            <button 
-              type="button" 
-              className="btn btn-outline-light me-2" 
-              onClick={onClose}
-              disabled={isLoading}
-            >
-              Отмена
-            </button>
-            <button 
-              type="submit" 
-              className="btn btn-danger"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <>
-                  <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                  Обработка...
-                </>
-              ) : 'Оплатить'}
-            </button>
-          </div>
-        </form>
-        
-        {/* Отладочная информация */}
-        {debug && (
-          <div className="mt-4 pt-4 border-top border-secondary">
-            <details open={!!error}>
-              <summary className="text-muted small">Техническая информация</summary>
-              <pre className="mt-2 p-2 bg-dark text-light small" style={{ maxHeight: '200px', overflow: 'auto' }}>
-                {JSON.stringify(debug, null, 2)}
-              </pre>
-            </details>
-          </div>
-        )}
-      </div>
-    </>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 } 

@@ -2,11 +2,337 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700&display=swap');
+
 :root {
   --foreground-rgb: 255, 255, 255;
-  --background-start-rgb: 13, 13, 13;
-  --background-end-rgb: 0, 0, 0;
-  --accent-color: 239, 68, 68;
+  --background-start-rgb: 10, 10, 15;
+  --background-end-rgb: 5, 5, 10;
+  
+  /* Неоновые цвета */
+  --neon-blue: 0, 195, 255;
+  --neon-purple: 190, 0, 255;
+  --neon-cyan: 0, 255, 240;
+  --primary-glow: conic-gradient(
+    from 180deg at 50% 50%,
+    #16abff33 0deg,
+    #0885ff33 55deg,
+    #54d6ff33 120deg,
+    #0071ff33 160deg,
+    transparent 360deg
+  );
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+    to bottom,
+    rgb(var(--background-start-rgb)),
+    rgb(var(--background-end-rgb))
+  );
+  background-attachment: fixed;
+  font-family: 'Inter', sans-serif;
+  line-height: 1.6;
+}
+
+h1, h2, h3 {
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Неоновые эффекты */
+.neon-blue {
+  color: rgba(var(--neon-blue), 1);
+  text-shadow: 0 0 5px rgba(var(--neon-blue), 0.5),
+               0 0 10px rgba(var(--neon-blue), 0.3),
+               0 0 15px rgba(var(--neon-blue), 0.2);
+}
+
+.neon-purple {
+  color: rgba(var(--neon-purple), 1);
+  text-shadow: 0 0 5px rgba(var(--neon-purple), 0.5),
+               0 0 10px rgba(var(--neon-purple), 0.3),
+               0 0 15px rgba(var(--neon-purple), 0.2);
+}
+
+.neon-cyan {
+  color: rgba(var(--neon-cyan), 1);
+  text-shadow: 0 0 5px rgba(var(--neon-cyan), 0.5),
+               0 0 10px rgba(var(--neon-cyan), 0.3),
+               0 0 15px rgba(var(--neon-cyan), 0.2);
+}
+
+/* Границы с неоновым свечением */
+.neon-border-blue {
+  border: 1px solid rgba(var(--neon-blue), 0.7);
+  box-shadow: 0 0 5px rgba(var(--neon-blue), 0.5),
+              inset 0 0 5px rgba(var(--neon-blue), 0.2);
+}
+
+.neon-border-purple {
+  border: 1px solid rgba(var(--neon-purple), 0.7);
+  box-shadow: 0 0 5px rgba(var(--neon-purple), 0.5),
+              inset 0 0 5px rgba(var(--neon-purple), 0.2);
+}
+
+.neon-border-cyan {
+  border: 1px solid rgba(var(--neon-cyan), 0.7);
+  box-shadow: 0 0 5px rgba(var(--neon-cyan), 0.5),
+              inset 0 0 5px rgba(var(--neon-cyan), 0.2);
+}
+
+/* Кнопки */
+.cyber-button {
+  position: relative;
+  background: transparent;
+  color: rgba(var(--neon-blue), 1);
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 1px;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 0.75rem 1.5rem;
+  border: 1px solid rgba(var(--neon-blue), 0.7);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.cyber-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(var(--neon-blue), 0.2),
+    transparent
+  );
+  z-index: -1;
+  transition: left 0.7s ease;
+}
+
+.cyber-button:hover {
+  color: white;
+  border-color: rgba(var(--neon-blue), 1);
+  box-shadow: 0 0 10px rgba(var(--neon-blue), 0.5),
+              inset 0 0 5px rgba(var(--neon-blue), 0.2);
+}
+
+.cyber-button:hover::before {
+  left: 100%;
+}
+
+.cyber-button.purple {
+  color: rgba(var(--neon-purple), 1);
+  border-color: rgba(var(--neon-purple), 0.7);
+}
+
+.cyber-button.purple:hover {
+  border-color: rgba(var(--neon-purple), 1);
+  box-shadow: 0 0 10px rgba(var(--neon-purple), 0.5),
+              inset 0 0 5px rgba(var(--neon-purple), 0.2);
+}
+
+.cyber-button.cyan {
+  color: rgba(var(--neon-cyan), 1);
+  border-color: rgba(var(--neon-cyan), 0.7);
+}
+
+.cyber-button.cyan:hover {
+  border-color: rgba(var(--neon-cyan), 1);
+  box-shadow: 0 0 10px rgba(var(--neon-cyan), 0.5),
+              inset 0 0 5px rgba(var(--neon-cyan), 0.2);
+}
+
+/* Карточки */
+.cyber-card {
+  background: rgba(20, 20, 30, 0.5);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(var(--neon-blue), 0.3);
+  border-radius: 4px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.cyber-card:hover {
+  border-color: rgba(var(--neon-blue), 0.7);
+  box-shadow: 0 0 15px rgba(var(--neon-blue), 0.3);
+  transform: translateY(-5px);
+}
+
+/* Анимации */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Сетка на фоне */
+.cyber-grid {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(rgba(var(--neon-blue), 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(var(--neon-blue), 0.1) 1px, transparent 1px);
+  background-size: 50px 50px;
+  z-index: -1;
+  opacity: 0.2;
+}
+
+/* Скроллбар */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgb(var(--background-start-rgb));
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(var(--neon-blue), 0.7);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--neon-blue), 1);
+}
+
+/* Навигация */
+.cyber-nav {
+  background: rgba(10, 10, 15, 0.8);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(var(--neon-blue), 0.3);
+}
+
+.cyber-nav a {
+  color: rgba(255, 255, 255, 0.8);
+  transition: all 0.3s ease;
+}
+
+.cyber-nav a:hover, .cyber-nav a.active {
+  color: rgba(var(--neon-blue), 1);
+  text-shadow: 0 0 5px rgba(var(--neon-blue), 0.5);
+}
+
+/* Градиентный текст */
+.gradient-text {
+  background: linear-gradient(
+    90deg,
+    rgba(var(--neon-blue), 1) 0%,
+    rgba(var(--neon-purple), 1) 50%,
+    rgba(var(--neon-cyan), 1) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Выделение текста */
+::selection {
+  background: rgba(var(--neon-blue), 0.3);
+  color: white;
+}
+
+/* Разделители */
+.cyber-divider {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(var(--neon-blue), 0.7),
+    transparent
+  );
+  margin: 2rem 0;
+}
+
+/* Формы */
+.cyber-input {
+  background: rgba(20, 20, 30, 0.5);
+  border: 1px solid rgba(var(--neon-blue), 0.3);
+  color: white;
+  padding: 0.75rem 1rem;
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+}
+
+.cyber-input:focus {
+  border-color: rgba(var(--neon-blue), 0.7);
+  box-shadow: 0 0 10px rgba(var(--neon-blue), 0.3);
+  outline: none;
+}
+
+/* Анимированные ссылки */
+.cyber-link {
+  position: relative;
+  color: rgba(var(--neon-blue), 1);
+  text-decoration: none;
+  padding-bottom: 2px;
+}
+
+.cyber-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 1px;
+  background: rgba(var(--neon-blue), 1);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s ease;
+}
+
+.cyber-link:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* Маленькая кнопка для доната в подвале */
+.donate-button {
+  font-size: 0.8rem;
+  padding: 0.4rem 0.8rem;
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+}
+
+.donate-button:hover {
+  opacity: 1;
 }
 
 @media (prefers-color-scheme: dark) {

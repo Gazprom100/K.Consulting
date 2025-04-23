@@ -5,84 +5,50 @@ const WATA_API_TOKEN = process.env.WATA_API_TOKEN;
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('Получен вебхук от платежной системы');
+    // Получаем данные из запроса
+    const body = await request.json();
     
-    // Проверяем наличие токена
-    if (!WATA_API_TOKEN) {
-      console.error('Отсутствует токен API Wata для проверки вебхука');
-      return NextResponse.json(
-        { error: 'Ошибка конфигурации сервера' },
-        { status: 500 }
-      );
-    }
-
-    // Получаем и проверяем заголовок с подписью
-    const signature = request.headers.get('X-Signature');
+    // Логируем полученные данные
+    console.log('Получен вебхук от платежной системы:', body);
     
-    if (!signature) {
-      console.error('Отсутствует заголовок X-Signature');
-      return NextResponse.json(
-        { error: 'Отсутствует подпись' },
-        { status: 401 }
-      );
+    // Проверяем наличие обязательных полей в новом формате API
+    if (!body.id || !body.status) {
+      console.error('Отсутствуют обязательные поля в вебхуке');
+      return NextResponse.json({ error: 'Invalid webhook data' }, { status: 400 });
     }
     
-    // Парсим тело запроса
-    let body;
-    try {
-      body = await request.json();
-      console.log('Данные вебхука:', body);
-    } catch (error) {
-      console.error('Ошибка при чтении тела запроса:', error);
-      return NextResponse.json(
-        { error: 'Некорректное тело запроса' },
-        { status: 400 }
-      );
-    }
-
-    // Проверяем наличие необходимых полей
-    if (!body.order_id || !body.status) {
-      console.error('В вебхуке отсутствуют обязательные поля');
-      return NextResponse.json(
-        { error: 'Неполные данные' },
-        { status: 400 }
-      );
-    }
-
-    // Определяем и логируем статус платежа
-    const { order_id, status, amount } = body;
+    // Обрабатываем статус платежа
+    const { id, status, amount, orderId } = body;
     
-    console.log(`Обновление статуса платежа: ${order_id}, статус: ${status}, сумма: ${amount}`);
-    
-    // Обрабатываем различные статусы
-    switch (status) {
+    // Здесь можно добавить логику обработки платежа
+    // например, обновление статуса в базе данных
+    switch (status.toLowerCase()) {
+      case 'completed':
       case 'success':
-        // Здесь логика для успешного платежа
-        // Например, обновление базы данных, отправка письма и т.д.
-        console.log(`Платеж ${order_id} успешно завершен на сумму ${amount}`);
+        console.log(`Платеж ${id} (заказ ${orderId}) успешно завершен на сумму ${amount}`);
+        // Тут можно обновить статус заказа в базе данных
         break;
-        
       case 'failed':
-        // Логика для неудачного платежа
-        console.log(`Платеж ${order_id} завершился неудачей`);
+      case 'fail':
+      case 'cancelled':
+        console.log(`Платеж ${id} (заказ ${orderId}) не выполнен`);
+        // Тут можно обновить статус заказа в базе данных
         break;
-        
       case 'pending':
-        // Логика для ожидающего платежа
-        console.log(`Платеж ${order_id} в ожидании`);
+        console.log(`Платеж ${id} (заказ ${orderId}) в процессе`);
+        // Тут можно обновить статус заказа в базе данных
         break;
-        
       default:
-        console.log(`Получен неизвестный статус для платежа ${order_id}: ${status}`);
+        console.log(`Получен неизвестный статус платежа ${id} (заказ ${orderId}): ${status}`);
     }
 
-    // Возвращаем успешный ответ
+    // Отвечаем платежной системе об успешном получении вебхука
     return NextResponse.json({ success: true });
-
+    
   } catch (error: any) {
     console.error('Ошибка при обработке вебхука:', error);
     return NextResponse.json(
-      { error: 'Внутренняя ошибка сервера', details: error.message },
+      { error: 'Internal server error', details: error.message },
       { status: 500 }
     );
   }
